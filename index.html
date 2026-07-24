@@ -132,23 +132,37 @@
   .breadcrumb a { color:var(--ink-soft); text-decoration:underline; text-underline-offset:2px; cursor:pointer; }
   .breadcrumb a:hover { color:var(--ink); }
 
-  /* carousel (reused for home + category pages) */
-  .carousel { position:relative; aspect-ratio:16/6; min-height:220px; overflow:hidden; }
+  /* carousel (reused for home + category pages) — sliding track w/ drag support */
+  .carousel { position:relative; aspect-ratio:16/6; min-height:220px; overflow:hidden; background:var(--surface-2); }
   .carousel.empty { display:none; }
-  .car-slide { position:absolute; inset:0; opacity:0; transition:opacity .5s ease; display:flex; align-items:center; padding:0 48px; cursor:pointer; overflow:hidden; }
-  .car-slide.on { opacity:1; }
-  .car-slide img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; }
-  .car-slide::before { content:""; position:absolute; inset:0; background:linear-gradient(90deg, rgba(247,243,236,.94) 0%, rgba(247,243,236,.74) 38%, rgba(247,243,236,.18) 68%, rgba(247,243,236,0) 100%); z-index:1; }
-  .car-slide > div { position:relative; z-index:2; }
+  .car-viewport { position:absolute; inset:0; overflow:hidden; }
+  .car-track { display:flex; height:100%; will-change:transform; transition:transform .55s cubic-bezier(.22,.9,.32,1); }
+  .car-track.dragging { transition:none; }
+  .car-slide {
+    position:relative; flex:0 0 100%; width:100%; height:100%;
+    display:flex; align-items:center; padding:0 48px; overflow:hidden;
+    cursor:grab; user-select:none; -webkit-user-select:none; touch-action:pan-y;
+  }
+  .car-slide:active { cursor:grabbing; }
+  .car-slide img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; pointer-events:none; -webkit-user-drag:none; }
+  .car-slide::before { content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(90deg, rgba(247,243,236,.94) 0%, rgba(247,243,236,.74) 38%, rgba(247,243,236,.18) 68%, rgba(247,243,236,0) 100%); z-index:1; }
+  .car-slide > div { position:relative; z-index:2; pointer-events:none; }
   .car-slide .car-tag { display:inline-block; font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; background:var(--ink); color:var(--bg); padding:5px 11px; border-radius:2px; margin-bottom:14px; }
   .car-slide h3 { font-size:clamp(1.4rem,1rem+2vw,2.2rem); margin:0 0 10px; text-transform:uppercase; letter-spacing:-.01em; line-height:1.1; max-width:16ch; text-wrap:balance; }
   .car-slide p.car-cta { font-size:.82rem; font-weight:700; text-decoration:underline; text-underline-offset:3px; margin:0; }
-  .car-arrow { position:absolute; top:50%; transform:translateY(-50%); border:none; width:34px; height:34px; border-radius:50%; background:rgba(255,255,255,.85); cursor:pointer; display:flex; align-items:center; justify-content:center; z-index:2; }
+  .car-arrow {
+    position:absolute; top:50%; transform:translateY(-50%); border:none; width:36px; height:36px; border-radius:50%;
+    background:rgba(255,255,255,.92); cursor:pointer; display:flex; align-items:center; justify-content:center; z-index:3;
+    box-shadow:0 2px 10px rgba(43,38,32,.16); transition:transform .15s ease, background .15s ease;
+  }
+  .car-arrow:hover { background:#fff; transform:translateY(-50%) scale(1.07); }
+  .car-arrow:active { transform:translateY(-50%) scale(.96); }
   .car-arrow svg { width:14px; height:14px; stroke:var(--ink); }
   .car-prev { left:16px; } .car-next { right:16px; }
-  .car-dots { position:absolute; left:0; right:0; bottom:14px; display:flex; justify-content:center; gap:6px; z-index:2; }
-  .car-dots button { width:6px; height:6px; border-radius:50%; border:none; background:rgba(255,255,255,.55); padding:0; cursor:pointer; }
-  .car-dots button.on { background:#fff; width:16px; border-radius:3px; }
+  .car-dots { position:absolute; left:0; right:0; bottom:14px; display:flex; justify-content:center; gap:6px; z-index:3; }
+  .car-dots button { width:6px; height:6px; border-radius:50%; border:none; background:rgba(255,255,255,.55); padding:0; cursor:pointer; transition:width .2s ease, background .2s ease; }
+  .car-dots button.on { background:#fff; width:18px; border-radius:3px; }
+  @media (max-width:640px) { .car-slide { padding:0 26px; } .car-arrow { width:30px; height:30px; } .car-arrow svg { width:12px; height:12px; } }
 
   /* product rails */
   .rail { padding:34px 0 4px; }
@@ -1342,46 +1356,99 @@
   });
 
   function mountCarousel(container, slides, onClickSlide){
+    // replace with a clean clone first so re-mounting never stacks up old listeners/timers
+    var fresh = container.cloneNode(false);
+    container.parentNode.replaceChild(fresh, container);
+    container = fresh;
     container.innerHTML = "";
-    if (!slides.length){ container.classList.add("empty"); return; }
+    if (!slides.length){ container.classList.add("empty"); return container; }
     container.classList.remove("empty");
-    slides.forEach(function(s, i){
+
+    var viewport = document.createElement("div"); viewport.className = "car-viewport";
+    var track = document.createElement("div"); track.className = "car-track";
+    slides.forEach(function(s){
       var el = document.createElement("div");
-      el.className = "car-slide" + (i === 0 ? " on" : "");
-      el.style.cursor = s.cat ? "pointer" : "default";
+      el.className = "car-slide";
       el.innerHTML =
-        '<img src="'+s.img+'" alt="" />' +
+        '<img src="'+s.img+'" alt="" draggable="false" />' +
         '<div><span class="car-tag">'+esc(s.tag)+'</span><h3>'+esc(s.title)+'</h3>' +
         (s.cat ? '<p class="car-cta">Ver '+esc(CATLABEL[s.cat] || s.cat)+' →</p>' : '') +
         '</div>';
-      el.addEventListener("click", function(){ if (s.cat) onClickSlide(s.cat); });
-      container.appendChild(el);
+      track.appendChild(el);
     });
+    viewport.appendChild(track);
+    container.appendChild(viewport);
+
+    var idx = 0, dots = null, timer = null;
+    function goTo(i, instant){
+      idx = (i + slides.length) % slides.length;
+      if (instant) track.classList.add("dragging");
+      track.style.transform = "translateX(" + (-idx * 100) + "%)";
+      if (instant){ void track.offsetWidth; track.classList.remove("dragging"); }
+      if (dots) Array.prototype.forEach.call(dots.children, function(d,k){ d.classList.toggle("on", k===idx); });
+    }
+
     if (slides.length > 1){
       var prev = document.createElement("button"); prev.className = "car-arrow car-prev"; prev.type = "button"; prev.setAttribute("aria-label","Anterior");
       prev.innerHTML = '<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="m15 18-6-6 6-6"/></svg>';
       var next = document.createElement("button"); next.className = "car-arrow car-next"; next.type = "button"; next.setAttribute("aria-label","Próximo");
       next.innerHTML = '<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="m9 18 6-6-6-6"/></svg>';
-      var dots = document.createElement("div"); dots.className = "car-dots";
-      var idx = 0;
-      function go(i){
-        idx = (i + slides.length) % slides.length;
-        container.querySelectorAll(".car-slide").forEach(function(el,k){ el.classList.toggle("on", k===idx); });
-        Array.prototype.forEach.call(dots.children, function(d,k){ d.classList.toggle("on", k===idx); });
-      }
-      slides.forEach(function(s,i){
-        var d = document.createElement("button");
+      dots = document.createElement("div"); dots.className = "car-dots";
+      slides.forEach(function(s, i){
+        var d = document.createElement("button"); d.type = "button"; d.setAttribute("aria-label", "Ir pro slide " + (i+1));
         if (i===0) d.className = "on";
-        d.addEventListener("click", function(ev){ ev.stopPropagation(); go(i); });
+        d.addEventListener("click", function(ev){ ev.stopPropagation(); goTo(i); });
         dots.appendChild(d);
       });
-      prev.addEventListener("click", function(ev){ ev.stopPropagation(); go(idx-1); });
-      next.addEventListener("click", function(ev){ ev.stopPropagation(); go(idx+1); });
+      prev.addEventListener("click", function(ev){ ev.stopPropagation(); goTo(idx-1); });
+      next.addEventListener("click", function(ev){ ev.stopPropagation(); goTo(idx+1); });
       container.appendChild(prev); container.appendChild(next); container.appendChild(dots);
-      var timer = setInterval(function(){ go(idx+1); }, 5000);
+
+      timer = setInterval(function(){ goTo(idx+1); }, 5000);
       container.addEventListener("mouseenter", function(){ clearInterval(timer); });
-      container.addEventListener("mouseleave", function(){ timer = setInterval(function(){ go(idx+1); }, 5000); });
+      container.addEventListener("mouseleave", function(){ clearInterval(timer); timer = setInterval(function(){ goTo(idx+1); }, 5000); });
     }
+
+    // ---- drag / swipe (mouse + touch, via Pointer Events) ----
+    var dragging = false, startX = 0, startTranslate = 0, moved = 0, viewportWidth = 0;
+    track.addEventListener("pointerdown", function(e){
+      dragging = true; moved = 0; startX = e.clientX;
+      viewportWidth = viewport.getBoundingClientRect().width || 1;
+      startTranslate = -idx * viewportWidth;
+      track.classList.add("dragging");
+      if (slides.length > 1) clearInterval(timer);
+      try { track.setPointerCapture(e.pointerId); } catch(err){}
+    });
+    track.addEventListener("pointermove", function(e){
+      if (!dragging) return;
+      var dx = e.clientX - startX;
+      moved = Math.abs(dx);
+      track.style.transform = "translateX(" + (startTranslate + dx) + "px)";
+    });
+    function endDrag(e){
+      if (!dragging) return;
+      dragging = false;
+      track.classList.remove("dragging");
+      var dx = (e.clientX != null ? e.clientX : startX) - startX;
+      var threshold = viewportWidth * 0.16;
+      if (dx <= -threshold) goTo(idx + 1);
+      else if (dx >= threshold) goTo(idx - 1);
+      else goTo(idx);
+      if (slides.length > 1){ clearInterval(timer); timer = setInterval(function(){ goTo(idx+1); }, 5000); }
+      if (moved < 6 && e.target && e.target.closest){
+        var slideEl = e.target.closest(".car-slide");
+        if (slideEl){
+          var i2 = Array.prototype.indexOf.call(track.children, slideEl);
+          var s = slides[i2];
+          if (s && s.cat) onClickSlide(s.cat);
+        }
+      }
+    }
+    track.addEventListener("pointerup", endDrag);
+    track.addEventListener("pointercancel", endDrag);
+
+    goTo(0, true);
+    return container;
   }
 
   function renderHomeCarousel(){
@@ -1476,7 +1543,7 @@
     document.getElementById("cat-sub").textContent = prods.length + (prods.length===1 ? " produto" : " produtos");
     document.getElementById("cat-grid").innerHTML = prods.map(function(p){ return cardHTML(p, true); }).join("");
     var carEl = document.getElementById("cat-carousel");
-    if (cat.hasCarousel && cat.slides.length){ mountCarousel(carEl, cat.slides, function(){}); carEl.style.display = ""; }
+    if (cat.hasCarousel && cat.slides.length){ carEl = mountCarousel(carEl, cat.slides, function(){}); carEl.style.display = ""; }
     else { carEl.innerHTML = ""; carEl.style.display = "none"; }
     showLojaScreen("categoria");
     urlEl.textContent = "mizamoda.com.br/categoria/" + catId;
