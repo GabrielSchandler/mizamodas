@@ -144,7 +144,8 @@
     cursor:grab; user-select:none; -webkit-user-select:none; touch-action:pan-y;
   }
   .car-slide:active { cursor:grabbing; }
-  .car-slide img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; pointer-events:none; -webkit-user-drag:none; }
+  .car-slide img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; pointer-events:none; -webkit-user-drag:none; animation:car-kenburns 9s ease-in-out infinite alternate; }
+  @keyframes car-kenburns { from { transform:scale(1); } to { transform:scale(1.09); } }
   .car-slide::before { content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(90deg, rgba(247,243,236,.94) 0%, rgba(247,243,236,.74) 38%, rgba(247,243,236,.18) 68%, rgba(247,243,236,0) 100%); z-index:1; }
   .car-slide > div { position:relative; z-index:2; pointer-events:none; }
   .car-slide .car-tag { display:inline-block; font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; background:var(--ink); color:var(--bg); padding:5px 11px; border-radius:2px; margin-bottom:14px; }
@@ -169,7 +170,8 @@
   .rail-head { display:flex; align-items:baseline; justify-content:space-between; padding:0 32px 14px; }
   .rail-head h3 { font-size:1.05rem; margin:0; text-transform:uppercase; letter-spacing:-.005em; }
   .rail-head span { font-size:.72rem; color:var(--ink-soft); }
-  .rail-track { display:flex; gap:14px; overflow-x:auto; padding:0 32px 10px; scroll-snap-type:x proximity; }
+  .rail-track { display:flex; gap:14px; overflow-x:auto; padding:0 32px 10px; scroll-snap-type:x proximity; cursor:grab; }
+  .rail-track.dragging { scroll-snap-type:none; cursor:grabbing; scroll-behavior:auto; }
   .rail-track .p-card { flex:0 0 180px; scroll-snap-align:start; }
   .rail-track:empty::after { content:"Nada por aqui ainda."; font-size:.8rem; color:var(--ink-soft); padding:0 32px; }
 
@@ -190,8 +192,9 @@
   .p-swatch::after { content:""; position:absolute; inset:0; background: repeating-linear-gradient(135deg, rgba(0,0,0,.05) 0 2px, transparent 2px 14px); }
   .p-swatch.has-photo { background:var(--surface-2); }
   .p-swatch.has-photo::after { display:none; }
-  .p-swatch img, .c-thumb img, .row-thumb img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .p-swatch img, .c-thumb img, .row-thumb img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; -webkit-user-drag:none; user-select:none; transition:transform .5s cubic-bezier(.22,.9,.32,1); }
   .c-thumb, .row-thumb { position:relative; overflow:hidden; }
+  .p-card:hover .p-swatch img { transform:scale(1.045); }
   .p-badge { position:absolute; top:10px; left:10px; background:var(--accent); color:#FBF6EE; font-size:.6rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; padding:4px 8px; border-radius:2px; z-index:1; }
   .p-info { padding:12px 14px 14px; }
   .p-name { font-size:.84rem; font-weight:600; margin:0 0 4px; }
@@ -218,7 +221,7 @@
 
   .pdp-thumbs { display:flex; gap:8px; margin-top:10px; }
   .pdp-thumb { width:56px; height:70px; flex:none; border-radius:3px; overflow:hidden; border:2px solid transparent; padding:0; cursor:pointer; background:none; opacity:.65; }
-  .pdp-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
+  .pdp-thumb img { width:100%; height:100%; object-fit:cover; display:block; -webkit-user-drag:none; user-select:none; }
   .pdp-thumb.on { border-color:var(--accent); opacity:1; }
 
   .pdp-rating { display:flex; align-items:center; gap:8px; margin:0 0 14px; font-size:.8rem; color:var(--ink-soft); }
@@ -1329,7 +1332,7 @@
 
   function cardHTML(p, showBadge){
     var media = '<div class="p-swatch'+(p.img?' has-photo':'')+'">' +
-      (p.img ? '<img src="'+p.img+'" alt="" loading="lazy" />' : '') +
+      (p.img ? '<img src="'+p.img+'" alt="" loading="lazy" draggable="false" />' : '') +
       (showBadge && p.badge ? '<span class="p-badge">'+p.badge+'</span>' : '') + '</div>';
     return '<div class="p-card" data-open-product="'+p.id+'">' + media +
       '<div class="p-info">' +
@@ -1461,6 +1464,37 @@
     renderRail("rail-bestsellers", PRODUCTS.filter(function(p){ return p.bestseller; }).map(function(p){ return p.id; }));
     renderRail("rail-new", PRODUCTS.filter(function(p){ return p.badge === "Lançamento"; }).map(function(p){ return p.id; }));
   }
+
+  // mouse click-and-drag scrolling for horizontal product rails (touch already scrolls natively)
+  function makeDragScrollable(el){
+    var dragging = false, startX = 0, startScroll = 0, moved = 0;
+    el.addEventListener("pointerdown", function(e){
+      if (e.pointerType !== "mouse") return;
+      dragging = true; moved = 0; startX = e.clientX; startScroll = el.scrollLeft;
+      el.classList.add("dragging");
+      try { el.setPointerCapture(e.pointerId); } catch(err){}
+    });
+    el.addEventListener("pointermove", function(e){
+      if (!dragging) return;
+      var dx = e.clientX - startX;
+      moved = Math.max(moved, Math.abs(dx));
+      el.scrollLeft = startScroll - dx;
+    });
+    function stop(){
+      if (!dragging) return;
+      dragging = false;
+      el.classList.remove("dragging");
+    }
+    el.addEventListener("pointerup", stop);
+    el.addEventListener("pointercancel", stop);
+    el.addEventListener("click", function(e){
+      if (moved > 6) e.stopPropagation();
+      moved = 0;
+    }, true);
+  }
+  ["rail-bestsellers", "rail-new", "pdp-related"].forEach(function(id){
+    makeDragScrollable(document.getElementById(id));
+  });
 
   /* ======================= LOJA: home catalog + search ======================= */
 
@@ -1603,7 +1637,7 @@
     var pdpSwatch = document.getElementById("pdp-swatch");
     var existingImg = pdpSwatch.querySelector("img");
     if (existingImg) existingImg.remove();
-    if (src){ var img = document.createElement("img"); img.src = src; img.alt = ""; pdpSwatch.insertBefore(img, pdpSwatch.firstChild); }
+    if (src){ var img = document.createElement("img"); img.src = src; img.alt = ""; img.draggable = false; pdpSwatch.insertBefore(img, pdpSwatch.firstChild); }
     pdpSwatch.classList.toggle("has-photo", !!src);
   }
 
@@ -1638,7 +1672,7 @@
     var thumbsEl = document.getElementById("pdp-thumbs");
     thumbsEl.style.display = gallery.length > 1 ? "flex" : "none";
     thumbsEl.innerHTML = gallery.map(function(src, i){
-      return '<button type="button" class="pdp-thumb'+(i===0?" on":"")+'" data-thumb-src="'+src+'"><img src="'+src+'" alt="" /></button>';
+      return '<button type="button" class="pdp-thumb'+(i===0?" on":"")+'" data-thumb-src="'+src+'"><img src="'+src+'" alt="" draggable="false" /></button>';
     }).join("");
 
     document.getElementById("pdp-rating").innerHTML = starsHTML(productRating(p)) + ' <span>'+productRating(p).toFixed(1)+' · '+productReviewCount(p)+' avaliações</span>';
