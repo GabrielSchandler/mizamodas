@@ -208,6 +208,9 @@
   .pdp { display:grid; grid-template-columns:1fr 1fr; gap:40px; padding:20px 32px 8px; }
   @media (max-width:760px) { .pdp { grid-template-columns:1fr; } }
   .pdp-media .p-swatch { aspect-ratio:4/5; border-radius:4px; }
+  .pdp-gallery-slide { position:relative; flex:0 0 100%; width:100%; height:100%; cursor:grab; user-select:none; -webkit-user-select:none; touch-action:pan-y; }
+  .pdp-gallery-slide:active { cursor:grabbing; }
+  .pdp-gallery-slide img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; pointer-events:none; -webkit-user-drag:none; animation:car-kenburns 9s ease-in-out infinite alternate; }
   .pdp-cat { font-size:.72rem; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-soft); margin:0 0 8px; }
   .pdp-info h1 { font-size:1.5rem; margin:0 0 10px; text-wrap:balance; }
   .pdp-price { font-size:1.3rem; font-weight:700; color:var(--accent); margin:0 0 2px; font-variant-numeric:tabular-nums; }
@@ -1633,14 +1636,90 @@
         '<p style="margin:0; font-size:.83rem; color:var(--ink-soft); line-height:1.6;">'+esc(r.text)+'</p></div>';
     }).join("");
   }
-  function setPdpMainImage(src){
-    var pdpSwatch = document.getElementById("pdp-swatch");
-    var existingImg = pdpSwatch.querySelector("img");
-    if (existingImg) existingImg.remove();
-    if (src){ var img = document.createElement("img"); img.src = src; img.alt = ""; img.draggable = false; pdpSwatch.insertBefore(img, pdpSwatch.firstChild); }
-    pdpSwatch.classList.toggle("has-photo", !!src);
+  // PDP photo gallery: sliding carousel w/ drag, arrows, autoplay — reuses .car-viewport/.car-track
+  function mountPdpGallery(images){
+    var old = document.getElementById("pdp-swatch");
+    var container = old.cloneNode(false);
+    old.parentNode.replaceChild(container, old);
+    container.className = "p-swatch" + (images.length ? " has-photo" : "");
+    container.innerHTML = '<span class="p-badge" id="pdp-badge" style="display:none;"></span>';
+    if (!images.length) return { goTo:function(){} };
+
+    var viewport = document.createElement("div"); viewport.className = "car-viewport";
+    var track = document.createElement("div"); track.className = "car-track";
+    images.forEach(function(src){
+      var slide = document.createElement("div");
+      slide.className = "pdp-gallery-slide";
+      slide.innerHTML = '<img src="'+src+'" alt="" draggable="false" />';
+      track.appendChild(slide);
+    });
+    viewport.appendChild(track);
+    container.insertBefore(viewport, container.firstChild);
+
+    var idx = 0, timer = null;
+    function syncThumbs(){
+      document.querySelectorAll("#pdp-thumbs .pdp-thumb").forEach(function(b,i){ b.classList.toggle("on", i === idx); });
+    }
+    function goTo(i, instant){
+      idx = (i + images.length) % images.length;
+      if (instant) track.classList.add("dragging");
+      track.style.transform = "translateX(" + (-idx * 100) + "%)";
+      if (instant){ void track.offsetWidth; track.classList.remove("dragging"); }
+      syncThumbs();
+    }
+    function restartAutoplay(){
+      if (images.length < 2) return;
+      clearInterval(timer);
+      timer = setInterval(function(){ goTo(idx+1); }, 4500);
+    }
+
+    if (images.length > 1){
+      var prev = document.createElement("button"); prev.className = "car-arrow car-prev"; prev.type = "button"; prev.setAttribute("aria-label","Foto anterior");
+      prev.innerHTML = '<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="m15 18-6-6 6-6"/></svg>';
+      var next = document.createElement("button"); next.className = "car-arrow car-next"; next.type = "button"; next.setAttribute("aria-label","Próxima foto");
+      next.innerHTML = '<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="m9 18 6-6-6-6"/></svg>';
+      prev.addEventListener("click", function(ev){ ev.stopPropagation(); goTo(idx-1); restartAutoplay(); });
+      next.addEventListener("click", function(ev){ ev.stopPropagation(); goTo(idx+1); restartAutoplay(); });
+      container.appendChild(prev); container.appendChild(next);
+      container.addEventListener("mouseenter", function(){ clearInterval(timer); });
+      container.addEventListener("mouseleave", restartAutoplay);
+      restartAutoplay();
+    }
+
+    var dragging = false, startX = 0, startTranslate = 0, moved = 0, vw = 0;
+    track.addEventListener("pointerdown", function(e){
+      dragging = true; moved = 0; startX = e.clientX;
+      vw = viewport.getBoundingClientRect().width || 1;
+      startTranslate = -idx * vw;
+      track.classList.add("dragging");
+      clearInterval(timer);
+      try { track.setPointerCapture(e.pointerId); } catch(err){}
+    });
+    track.addEventListener("pointermove", function(e){
+      if (!dragging) return;
+      var dx = e.clientX - startX;
+      moved = Math.abs(dx);
+      track.style.transform = "translateX(" + (startTranslate + dx) + "px)";
+    });
+    function endDrag(e){
+      if (!dragging) return;
+      dragging = false;
+      track.classList.remove("dragging");
+      var dx = (e.clientX != null ? e.clientX : startX) - startX;
+      var threshold = vw * 0.16;
+      if (dx <= -threshold) goTo(idx + 1);
+      else if (dx >= threshold) goTo(idx - 1);
+      else goTo(idx);
+      restartAutoplay();
+    }
+    track.addEventListener("pointerup", endDrag);
+    track.addEventListener("pointercancel", endDrag);
+
+    goTo(0, true);
+    return { goTo:function(i){ goTo(i); restartAutoplay(); } };
   }
 
+  var pdpGalleryCtrl = null;
   var pdpQty = 1;
   function goToProduct(id){
     var p = productById(id);
@@ -1664,15 +1743,14 @@
     var addBtn = document.getElementById("pdp-add");
     addBtn.disabled = p.stock === 0;
     addBtn.textContent = p.stock === 0 ? "Sem estoque" : "Adicionar ao carrinho";
+    var gallery = p.gallery && p.gallery.length ? p.gallery : (p.img ? [p.img] : []);
+    pdpGalleryCtrl = mountPdpGallery(gallery);
     var badgeEl = document.getElementById("pdp-badge");
     if (p.badge){ badgeEl.textContent = p.badge; badgeEl.style.display = ""; } else { badgeEl.style.display = "none"; }
-
-    var gallery = p.gallery && p.gallery.length ? p.gallery : (p.img ? [p.img] : []);
-    setPdpMainImage(gallery[0]);
     var thumbsEl = document.getElementById("pdp-thumbs");
     thumbsEl.style.display = gallery.length > 1 ? "flex" : "none";
     thumbsEl.innerHTML = gallery.map(function(src, i){
-      return '<button type="button" class="pdp-thumb'+(i===0?" on":"")+'" data-thumb-src="'+src+'"><img src="'+src+'" alt="" draggable="false" /></button>';
+      return '<button type="button" class="pdp-thumb'+(i===0?" on":"")+'" data-thumb-src="'+src+'" data-idx="'+i+'"><img src="'+src+'" alt="" draggable="false" /></button>';
     }).join("");
 
     document.getElementById("pdp-rating").innerHTML = starsHTML(productRating(p)) + ' <span>'+productRating(p).toFixed(1)+' · '+productReviewCount(p)+' avaliações</span>';
@@ -1698,10 +1776,8 @@
   });
   document.getElementById("pdp-thumbs").addEventListener("click", function(e){
     var btn = e.target.closest(".pdp-thumb");
-    if (!btn) return;
-    this.querySelectorAll(".pdp-thumb").forEach(function(b){ b.classList.remove("on"); });
-    btn.classList.add("on");
-    setPdpMainImage(btn.dataset.thumbSrc);
+    if (!btn || !pdpGalleryCtrl) return;
+    pdpGalleryCtrl.goTo(Number(btn.dataset.idx));
   });
   document.getElementById("size-picker").addEventListener("click", function(e){
     var btn = e.target.closest("button[data-size]");
