@@ -101,6 +101,53 @@
   .frame.mobile-view #view-loja .pdp,
   .frame.mobile-view #view-loja .cat-grid { padding-left:20px; padding-right:20px; }
 
+  /* ---------- mobile device preview (painel) ---------- */
+  .frame.mobile-view #view-painel .app { flex-direction:column; height:700px; }
+  .frame.mobile-view #view-painel .side { display:none; }
+  .frame.mobile-view #view-painel .main { flex:1; min-height:0; overflow-y:auto; padding:16px 16px 10px; }
+  .frame.mobile-view #view-painel .mobile-tabbar { display:flex; }
+  .frame.mobile-view #view-painel .main-topbar { margin-bottom:16px; }
+  .frame.mobile-view #view-painel .main-topbar-greet { font-size:.8rem; }
+  .frame.mobile-view #view-painel .main-head { margin-bottom:16px; }
+  .frame.mobile-view #view-painel .main-head h2 { font-size:1.12rem; }
+  .frame.mobile-view #view-painel .notif-dropdown { width:250px; }
+
+  .frame.mobile-view #view-painel .kpis,
+  .frame.mobile-view .modal .kpis { grid-template-columns:1fr 1fr; gap:10px; margin-bottom:18px; }
+  .frame.mobile-view #view-painel .kpi { padding:13px 14px; }
+  .frame.mobile-view #view-painel .kpi .k-value { font-size:1.2rem; }
+
+  .frame.mobile-view #view-painel .chart { gap:5px; height:126px; }
+  .frame.mobile-view #view-painel .bar-num .bn-qty, .frame.mobile-view #view-painel .bar-num .bn-rev { font-size:.62rem; }
+  .frame.mobile-view #view-painel .bar-day { font-size:.56rem; }
+
+  .frame.mobile-view #view-painel .cat-grid { grid-template-columns:repeat(2,1fr); }
+  .frame.mobile-view #view-painel .settings-grid { grid-template-columns:1fr; }
+  .frame.mobile-view #view-painel .gen-layout { grid-template-columns:1fr; }
+  .frame.mobile-view #view-painel .gen-preview { max-width:100%; }
+  .frame.mobile-view #view-painel .panel-block { padding:16px; }
+
+  /* tables -> stacked cards */
+  .frame.mobile-view table.data thead { display:none; }
+  .frame.mobile-view table.data,
+  .frame.mobile-view table.data tbody { display:block; width:100%; }
+  .frame.mobile-view table.data tr { display:block; border:1px solid var(--line); border-radius:8px; padding:12px 14px; margin-bottom:10px; background:var(--surface); }
+  .frame.mobile-view table.data tr:last-child { margin-bottom:0; }
+  .frame.mobile-view table.data td { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:6px 0 !important; border-bottom:none; text-align:right; }
+  .frame.mobile-view table.data td::before { content:attr(data-label); font-size:.64rem; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft); font-weight:700; flex:none; text-align:left; }
+  .frame.mobile-view table.data td[data-label=""]::before { display:none; }
+  .frame.mobile-view table.data td[data-label=""] { justify-content:flex-end; }
+  .frame.mobile-view table.data td:first-child { flex-direction:row; justify-content:flex-start; text-align:left; padding-top:0 !important; padding-bottom:10px !important; margin-bottom:6px; border-bottom:1px solid var(--line); font-weight:700; }
+  .frame.mobile-view table.data td:first-child::before { display:none; }
+  .frame.mobile-view table.data .row-prod { width:100%; }
+  .frame.mobile-view table.data .status-select { margin-left:auto; }
+
+  /* modal -> bottom sheet */
+  .frame.mobile-view .modal-veil { padding:0; align-items:flex-end; }
+  .frame.mobile-view .modal { width:100%; max-height:88%; overflow-y:auto; border-radius:16px 16px 0 0; }
+  .frame.mobile-view .modal-head { border-radius:16px 16px 0 0; }
+  .frame.mobile-view .sheet { width:92%; }
+
   /* =================== LOJA =================== */
   .loja-header { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:18px 32px; border-bottom:1px solid var(--line); background:var(--surface); position:relative; z-index:3; }
   .brand { display:flex; align-items:center; gap:10px; cursor:pointer; }
@@ -303,6 +350,20 @@
   .side-user { padding-top:14px; border-top:1px solid var(--side-line); font-size:.74rem; color:var(--side-soft); }
   .side-user strong { display:block; color:var(--side-ink); font-size:.82rem; font-weight:600; }
 
+  /* bottom tab bar — mobile painel nav only */
+  .mobile-tabbar { display:none; flex:none; border-top:1px solid var(--line); background:var(--surface); padding:6px 4px; }
+  .mobile-tabbar button { flex:1; border:none; background:none; display:flex; flex-direction:column; align-items:center; gap:3px; padding:6px 2px; color:var(--ink-soft); cursor:pointer; }
+  .mobile-tabbar button svg { width:19px; height:19px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+  .mobile-tabbar button span { font-size:.62rem; font-weight:600; }
+  .mobile-tabbar button.on { color:var(--accent); }
+
+  .more-nav-list { display:flex; flex-direction:column; }
+  .more-nav-item { display:flex; align-items:center; gap:12px; width:100%; border:none; background:none; padding:14px 4px; border-bottom:1px solid var(--line); font-size:.86rem; font-weight:600; color:var(--ink); cursor:pointer; text-align:left; }
+  .more-nav-item:last-child { border-bottom:none; }
+  .more-nav-item svg { width:18px; height:18px; flex:none; stroke:var(--ink-soft); fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+  .more-nav-item.on { color:var(--accent); }
+  .more-nav-item.on svg { stroke:var(--accent); }
+
   .main { flex:1; padding:28px 32px 40px; overflow-y:auto; min-width:0; }
   .main-topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
   .main-topbar-greet { margin:0; font-size:.86rem; font-weight:600; color:var(--ink-soft); }
@@ -337,6 +398,7 @@
   .kpi .k-delta { font-size:.72rem; margin:6px 0 0; color:var(--good); font-weight:600; }
   .kpi .k-delta.warn { color:var(--warn); }
   .kpi-spark { width:64px; height:22px; display:block; margin-top:10px; color:var(--accent); opacity:.85; }
+  .kpis-3 { grid-template-columns:repeat(3,1fr); }
 
   .panel-block { background:var(--surface); border:1px solid var(--line); border-radius:6px; padding:20px 22px; margin-bottom:20px; }
   .panel-block h3 { margin:0 0 4px; font-size:.92rem; }
@@ -351,8 +413,8 @@
     transition:opacity .12s ease;
   }
   .bar-num .bn-rev { opacity:0; }
-  .bar-col:hover .bar-num .bn-qty { opacity:0; }
-  .bar-col:hover .bar-num .bn-rev { opacity:1; }
+  .bar-col:hover .bar-num .bn-qty, .bar-col.tap-reveal .bar-num .bn-qty { opacity:0; }
+  .bar-col:hover .bar-num .bn-rev, .bar-col.tap-reveal .bar-num .bn-rev { opacity:1; }
   .bar { width:60%; border-radius:4px 4px 0 0; background: color-mix(in srgb, var(--accent) 42%, var(--surface)); transition:background .12s ease; }
   .bar-col.today .bar { background:var(--accent); }
   .bar-col.today .bar-num .bn-qty, .bar-col.today .bar-num .bn-rev { color:var(--accent); }
@@ -842,7 +904,7 @@
 
             <div class="p-view" id="pv-estoque">
               <div class="main-head"><div><h2>Estoque</h2><p>O que está acabando, pra repor a tempo</p></div></div>
-              <div class="kpis" style="grid-template-columns:repeat(3,1fr);">
+              <div class="kpis kpis-3">
                 <div class="kpi"><p class="k-label">Produtos ativos</p><p class="k-value" id="es-kpi-total">24</p></div>
                 <div class="kpi"><p class="k-label">Estoque baixo</p><p class="k-value" id="es-kpi-low">2</p><p class="k-delta warn">repor essa semana</p></div>
                 <div class="kpi"><p class="k-label">Esgotados</p><p class="k-value" id="es-kpi-out">1</p><p class="k-delta" style="color:#B33F3F;">parado há 4 dias</p></div>
@@ -1013,6 +1075,14 @@
             </div>
 
           </main>
+
+          <nav class="mobile-tabbar" id="mobile-tabbar">
+            <button type="button" class="on" data-view="dashboard"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.2"/><rect x="14" y="3" width="7" height="7" rx="1.2"/><rect x="3" y="14" width="7" height="7" rx="1.2"/><rect x="14" y="14" width="7" height="7" rx="1.2"/></svg><span>Início</span></button>
+            <button type="button" data-view="pedidos"><svg viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="13" rx="1.2"/><path d="M4 11h16"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/></svg><span>Pedidos</span></button>
+            <button type="button" data-view="produtos"><svg viewBox="0 0 24 24"><path d="M11 3h6a2 2 0 0 1 2 2v6a1 1 0 0 1-.3.7l-9 9a1 1 0 0 1-1.4 0l-6.7-6.7a1 1 0 0 1 0-1.4l9-9A1 1 0 0 1 11 3z"/><circle cx="15.5" cy="8.5" r="1.2"/></svg><span>Produtos</span></button>
+            <button type="button" data-view="clientes"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/></svg><span>Clientes</span></button>
+            <button type="button" id="mobile-more-btn"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg><span>Mais</span></button>
+          </nav>
         </div>
       </div>
 
@@ -1069,6 +1139,21 @@
           <div class="field"><label>Fim <span style="text-transform:none; font-weight:400;">(deixa em branco pra sem validade)</span></label><input type="datetime-local" id="cu-fim" /></div>
         </div>
         <div class="sheet-foot"><button class="btn-primary" style="width:100%;" id="cu-save">Criar cupom</button></div>
+      </div>
+
+      <div class="sheet" id="sheet-nav-more">
+        <div class="sheet-head"><h3>Mais opções</h3><button class="drawer-close" data-close-sheet="sheet-nav-more">✕</button></div>
+        <div class="sheet-body">
+          <div class="more-nav-list">
+            <button type="button" class="more-nav-item" data-view="relatorios"><svg viewBox="0 0 24 24"><path d="M4 20V10"/><path d="M11 20V4"/><path d="M18 20v-7"/></svg>Relatórios</button>
+            <button type="button" class="more-nav-item" data-view="categorias"><svg viewBox="0 0 24 24"><path d="M12 3 3 8l9 5 9-5-9-5z"/><path d="M3 13l9 5 9-5"/></svg>Categorias</button>
+            <button type="button" class="more-nav-item" data-view="estoque"><svg viewBox="0 0 24 24"><path d="M21 8 12 3 3 8l9 5 9-5z"/><path d="M3 8v9l9 5 9-5V8"/><path d="M12 13v9"/></svg>Estoque</button>
+            <button type="button" class="more-nav-item" data-view="cupons"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M9 6v12" stroke-dasharray="2 2.2"/></svg>Cupons</button>
+            <button type="button" class="more-nav-item" data-view="postagens"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg>Postagens</button>
+            <button type="button" class="more-nav-item" data-view="carrossel"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="6" height="10" rx="1"/><rect x="9" y="5" width="6" height="14" rx="1"/><rect x="16" y="7" width="6" height="10" rx="1"/></svg>Carrossel</button>
+            <button type="button" class="more-nav-item" data-view="configuracoes"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="7.2" stroke-dasharray="2 3"/></svg>Configurações</button>
+          </div>
+        </div>
       </div>
 
       <div class="modal-veil" id="modal-veil">
@@ -1822,11 +1907,6 @@
     document.getElementById("view-painel").classList.toggle("on", target === "painel");
     urlEl.textContent = target === "loja" ? "mizamoda.com.br" : "painel.mizamoda.com.br";
     closeDrawer();
-    deviceSwitcher.style.display = target === "loja" ? "inline-flex" : "none";
-    if (target === "painel"){
-      deviceSwitcher.querySelectorAll("button").forEach(function(b){ b.classList.toggle("on", b.dataset.device === "desktop"); });
-      frameEl.classList.remove("mobile-view");
-    }
   });
   deviceSwitcher.addEventListener("click", function(e){
     var btn = e.target.closest("button[data-device]");
@@ -1835,14 +1915,26 @@
     btn.classList.add("on");
     frameEl.classList.toggle("mobile-view", btn.dataset.device === "mobile");
   });
-  document.querySelectorAll(".side-nav button").forEach(function(btn){
-    btn.addEventListener("click", function(){
-      document.querySelectorAll(".side-nav button").forEach(function(b){ b.classList.remove("on"); });
-      btn.classList.add("on");
-      document.querySelectorAll(".p-view").forEach(function(v){ v.classList.remove("on"); });
-      document.getElementById("pv-" + btn.dataset.view).classList.add("on");
-    });
+
+  // views listed under the "Mais" sheet on mobile (not one of the 4 primary bottom-tab views)
+  var MORE_VIEWS = ["relatorios","categorias","estoque","cupons","postagens","carrossel","configuracoes"];
+  function switchPanelView(name){
+    document.querySelectorAll("[data-view]").forEach(function(b){ b.classList.toggle("on", b.dataset.view === name); });
+    document.querySelectorAll(".p-view").forEach(function(v){ v.classList.remove("on"); });
+    var view = document.getElementById("pv-" + name);
+    if (view) view.classList.add("on");
+    var moreBtn = document.getElementById("mobile-more-btn");
+    if (moreBtn) moreBtn.classList.toggle("on", MORE_VIEWS.indexOf(name) !== -1);
+    var mainEl = document.querySelector("#view-painel .main");
+    if (mainEl) mainEl.scrollTop = 0;
+  }
+  document.addEventListener("click", function(e){
+    var btn = e.target.closest("[data-view]");
+    if (!btn) return;
+    switchPanelView(btn.dataset.view);
+    closeSheet("sheet-nav-more");
   });
+  document.getElementById("mobile-more-btn").addEventListener("click", function(){ openSheet("sheet-nav-more"); });
 
   /* ======================= MODAL ======================= */
 
@@ -1874,12 +1966,19 @@
       el.appendChild(col);
     });
   }
+  // tap toggles qty/revenue too — hover alone doesn't exist on touch
+  document.getElementById("chart").addEventListener("click", function(e){
+    var col = e.target.closest(".bar-col");
+    if (!col) return;
+    document.querySelectorAll("#chart .bar-col.tap-reveal").forEach(function(c){ if (c !== col) c.classList.remove("tap-reveal"); });
+    col.classList.toggle("tap-reveal");
+  });
   function renderDashOrders(){
     var recent = ORDERS.slice(0,3);
     document.getElementById("dash-orders").innerHTML = recent.map(function(o){
       var c = customerById(o.customerId), m = STATUS_META[o.status];
-      return '<tr data-clickable data-open-order="'+o.id+'"><td>'+esc(c.name)+'</td><td>'+esc(o.items[0].name + (o.items.length>1 ? " +"+(o.items.length-1) : ""))+'</td>' +
-        '<td class="price-cell">'+money(orderTotal(o))+'</td><td><span class="status '+m.cls+'">'+m.label+'</span></td></tr>';
+      return '<tr data-clickable data-open-order="'+o.id+'"><td data-label="Cliente">'+esc(c.name)+'</td><td data-label="Produto">'+esc(o.items[0].name + (o.items.length>1 ? " +"+(o.items.length-1) : ""))+'</td>' +
+        '<td class="price-cell" data-label="Valor">'+money(orderTotal(o))+'</td><td data-label="Status"><span class="status '+m.cls+'">'+m.label+'</span></td></tr>';
     }).join("");
   }
 
@@ -1927,8 +2026,8 @@
     }).join("");
     var ranked = PRODUCTS.slice().sort(function(a,b){ return b.sales - a.sales; }).slice(0,8);
     document.getElementById("rep-top-products").innerHTML = ranked.map(function(p,i){
-      return '<tr><td>'+(i+1)+'</td><td>'+esc(p.name)+'</td><td>'+p.cats.map(function(c){ return CATLABEL[c]; }).join(", ")+'</td>' +
-        '<td>'+p.sales+'</td><td class="price-cell">'+money(p.sales*p.price)+'</td></tr>';
+      return '<tr><td data-label="#">'+(i+1)+'</td><td data-label="Produto">'+esc(p.name)+'</td><td data-label="Categoria">'+p.cats.map(function(c){ return CATLABEL[c]; }).join(", ")+'</td>' +
+        '<td data-label="Vendas">'+p.sales+'</td><td class="price-cell" data-label="Faturamento">'+money(p.sales*p.price)+'</td></tr>';
     }).join("");
   }
   document.getElementById("rep-period").addEventListener("change", function(){ renderReport(this.value); });
@@ -1982,8 +2081,7 @@
     n.read = true;
     notifDropdown.classList.remove("on");
     renderNotifications();
-    var navBtn = document.querySelector('.side-nav button[data-view="'+n.view+'"]');
-    if (navBtn) navBtn.click();
+    switchPanelView(n.view);
     if (n.openOrder) openPedidoModal(n.openOrder);
   });
 
@@ -1992,17 +2090,17 @@
   function renderProductTable(){
     document.getElementById("product-table").innerHTML = PRODUCTS.map(function(p){
       return '<tr data-clickable data-open-product="'+p.id+'">' +
-        '<td style="padding-left:22px;"><div class="row-prod"><div class="row-thumb">'+(p.img?'<img src="'+p.img+'" alt="" />':'')+'</div>'+esc(p.name)+'</div></td>' +
-        '<td>'+p.cats.map(function(c){return CATLABEL[c];}).join(", ")+'</td>' +
-        '<td class="price-cell">'+p.priceLabel+'</td>' +
-        '<td>'+p.stock+' un.</td>' +
-        '<td>'+stockStatus(p.stock)+'</td></tr>';
+        '<td style="padding-left:22px;" data-label="Produto"><div class="row-prod"><div class="row-thumb">'+(p.img?'<img src="'+p.img+'" alt="" />':'')+'</div>'+esc(p.name)+'</div></td>' +
+        '<td data-label="Categoria">'+p.cats.map(function(c){return CATLABEL[c];}).join(", ")+'</td>' +
+        '<td class="price-cell" data-label="Preço">'+p.priceLabel+'</td>' +
+        '<td data-label="Estoque">'+p.stock+' un.</td>' +
+        '<td data-label="Status">'+stockStatus(p.stock)+'</td></tr>';
     }).join("");
   }
   function renderStockTable(){
     document.getElementById("stock-table").innerHTML = PRODUCTS.map(function(p){
-      return '<tr data-clickable data-open-stock="'+p.id+'"><td style="padding-left:22px;"><div class="row-prod"><div class="row-thumb">'+(p.img?'<img src="'+p.img+'" alt="" />':'')+'</div>'+esc(p.name)+'</div></td>' +
-        '<td>'+p.stock+' un.</td><td>'+stockStatus(p.stock)+'</td><td><button class="icon-btn" type="button" title="Ajustar estoque">↻</button></td></tr>';
+      return '<tr data-clickable data-open-stock="'+p.id+'"><td style="padding-left:22px;" data-label="Produto"><div class="row-prod"><div class="row-thumb">'+(p.img?'<img src="'+p.img+'" alt="" />':'')+'</div>'+esc(p.name)+'</div></td>' +
+        '<td data-label="Estoque">'+p.stock+' un.</td><td data-label="Status">'+stockStatus(p.stock)+'</td><td data-label=""><button class="icon-btn" type="button" title="Ajustar estoque">↻</button></td></tr>';
     }).join("");
   }
   function renderStockKPIs(){
@@ -2048,7 +2146,7 @@
     var p = productById(id);
     var revenue = p.sales * p.price;
     var html =
-      '<div style="display:flex; gap:18px; margin-bottom:18px;">' +
+      '<div style="display:flex; gap:18px; margin-bottom:18px; flex-wrap:wrap;">' +
         '<div class="p-swatch'+(p.img?' has-photo':'')+'" style="width:120px; aspect-ratio:4/5; flex:none; border-radius:4px; overflow:hidden;">' +
           (p.img ? '<img src="'+p.img+'" alt="" />' : '') +
           (p.badge ? '<span class="p-badge">'+p.badge+'</span>' : '') + '</div>' +
@@ -2059,7 +2157,7 @@
       '<p class="modal-sub">Descrição</p>' +
       '<p style="font-size:.86rem; line-height:1.7; margin:0 0 6px;">'+esc(p.description || "Sem descrição cadastrada.")+'</p>' +
       '<p class="modal-sub">Indicadores</p>' +
-      '<div class="kpis" style="grid-template-columns:repeat(3,1fr); margin-bottom:0;">' +
+      '<div class="kpis kpis-3" style="margin-bottom:0;">' +
         '<div class="kpi"><p class="k-label">Vendas totais</p><p class="k-value">'+p.sales+'</p></div>' +
         '<div class="kpi"><p class="k-label">Faturamento gerado</p><p class="k-value">'+money(revenue)+'</p></div>' +
         '<div class="kpi"><p class="k-label">Estoque atual</p><p class="k-value">'+p.stock+'</p></div>' +
@@ -2117,12 +2215,12 @@
     document.getElementById("orders-table").innerHTML = ORDERS.map(function(o){
       var c = customerById(o.customerId);
       return '<tr>' +
-        '<td style="padding-left:22px; cursor:pointer;" data-open-order="'+o.id+'">#'+o.id+'</td>' +
-        '<td style="cursor:pointer;" data-open-order="'+o.id+'">'+esc(c.name)+'</td>' +
-        '<td>'+waLinkHTML(c.phone, c.phoneLabel)+'</td>' +
-        '<td style="cursor:pointer;" data-open-order="'+o.id+'">'+o.date+'</td>' +
-        '<td class="price-cell" style="cursor:pointer;" data-open-order="'+o.id+'">'+money(orderTotal(o))+'</td>' +
-        '<td>'+statusSelectHTML(o.id, o.status)+'</td></tr>';
+        '<td style="padding-left:22px; cursor:pointer;" data-open-order="'+o.id+'" data-label="Pedido">#'+o.id+'</td>' +
+        '<td style="cursor:pointer;" data-open-order="'+o.id+'" data-label="Cliente">'+esc(c.name)+'</td>' +
+        '<td data-label="Telefone">'+waLinkHTML(c.phone, c.phoneLabel)+'</td>' +
+        '<td style="cursor:pointer;" data-open-order="'+o.id+'" data-label="Data">'+o.date+'</td>' +
+        '<td class="price-cell" style="cursor:pointer;" data-open-order="'+o.id+'" data-label="Valor">'+money(orderTotal(o))+'</td>' +
+        '<td data-label="Status">'+statusSelectHTML(o.id, o.status)+'</td></tr>';
     }).join("");
   }
   function statusSelectHTML(orderId, status){
@@ -2151,7 +2249,7 @@
   function openPedidoModal(id){
     var o = orderById(id), c = customerById(o.customerId);
     var itemsHTML = o.items.map(function(i){
-      return '<tr><td>'+esc(i.name)+'</td><td>'+i.qty+'</td><td class="price-cell">'+money(i.price)+'</td><td class="price-cell">'+money(i.price*i.qty)+'</td></tr>';
+      return '<tr><td data-label="Produto">'+esc(i.name)+'</td><td data-label="Qtd">'+i.qty+'</td><td class="price-cell" data-label="Preço">'+money(i.price)+'</td><td class="price-cell" data-label="Subtotal">'+money(i.price*i.qty)+'</td></tr>';
     }).join("");
     var totalsHTML;
     if (o.coupon && couponByCode(o.coupon)){
@@ -2188,11 +2286,11 @@
       var orders = customerOrders(c.id);
       var tag = customerTag(c);
       return '<tr>' +
-        '<td style="padding-left:22px; cursor:pointer;" data-open-customer="'+c.id+'">'+esc(c.name)+' <span class="status '+tag.cls+'" style="margin-left:6px;">'+tag.label+'</span></td>' +
-        '<td>'+waLinkHTML(c.phone, c.phoneLabel)+'</td>' +
-        '<td style="cursor:pointer;" data-open-customer="'+c.id+'">'+orders.length+'</td>' +
-        '<td class="price-cell" style="cursor:pointer;" data-open-customer="'+c.id+'">'+money(customerTotalSpent(c.id))+'</td>' +
-        '<td style="cursor:pointer;" data-open-customer="'+c.id+'">'+c.since+'</td></tr>';
+        '<td style="padding-left:22px; cursor:pointer;" data-open-customer="'+c.id+'" data-label="Cliente">'+esc(c.name)+' <span class="status '+tag.cls+'" style="margin-left:6px;">'+tag.label+'</span></td>' +
+        '<td data-label="Telefone">'+waLinkHTML(c.phone, c.phoneLabel)+'</td>' +
+        '<td style="cursor:pointer;" data-open-customer="'+c.id+'" data-label="Pedidos">'+orders.length+'</td>' +
+        '<td class="price-cell" style="cursor:pointer;" data-open-customer="'+c.id+'" data-label="Total gasto">'+money(customerTotalSpent(c.id))+'</td>' +
+        '<td style="cursor:pointer;" data-open-customer="'+c.id+'" data-label="Cliente desde">'+c.since+'</td></tr>';
     }).join("");
   }
   document.getElementById("pv-clientes").addEventListener("click", function(e){
@@ -2205,7 +2303,7 @@
     var orders = customerOrders(c.id);
     var ordersHTML = orders.length ? orders.map(function(o){
       var m = STATUS_META[o.status];
-      return '<tr><td>#'+o.id+'</td><td>'+o.date+'</td><td class="price-cell">'+money(orderTotal(o))+'</td><td><span class="status '+m.cls+'">'+m.label+'</span></td></tr>';
+      return '<tr><td data-label="Pedido">#'+o.id+'</td><td data-label="Data">'+o.date+'</td><td class="price-cell" data-label="Valor">'+money(orderTotal(o))+'</td><td data-label="Status"><span class="status '+m.cls+'">'+m.label+'</span></td></tr>';
     }).join("") : '<tr><td colspan="4" style="color:var(--ink-soft);">Nenhum pedido ainda.</td></tr>';
     var tag = customerTag(c);
     var html =
@@ -2290,12 +2388,12 @@
     document.getElementById("coupon-table").innerHTML = COUPONS.map(function(c){
       var desc = c.type === "percent" ? (c.value + "%") : money(c.value);
       return '<tr>' +
-        '<td style="padding-left:22px; cursor:pointer;" data-open-coupon="'+esc(c.code)+'">'+esc(c.code)+'</td>' +
-        '<td style="cursor:pointer;" data-open-coupon="'+esc(c.code)+'">'+desc+'</td>' +
-        '<td style="cursor:pointer;" data-open-coupon="'+esc(c.code)+'">'+esc(c.scopeLabel)+'</td>' +
-        '<td style="cursor:pointer;" data-open-coupon="'+esc(c.code)+'">'+couponValidade(c)+'</td>' +
-        '<td style="cursor:pointer;" data-open-coupon="'+esc(c.code)+'">'+c.usos+'</td>' +
-        '<td>'+couponStatusSelectHTML(c.code, c.status)+'</td></tr>';
+        '<td style="padding-left:22px; cursor:pointer;" data-open-coupon="'+esc(c.code)+'" data-label="Código">'+esc(c.code)+'</td>' +
+        '<td style="cursor:pointer;" data-open-coupon="'+esc(c.code)+'" data-label="Desconto">'+desc+'</td>' +
+        '<td style="cursor:pointer;" data-open-coupon="'+esc(c.code)+'" data-label="Aplica a">'+esc(c.scopeLabel)+'</td>' +
+        '<td style="cursor:pointer;" data-open-coupon="'+esc(c.code)+'" data-label="Validade">'+couponValidade(c)+'</td>' +
+        '<td style="cursor:pointer;" data-open-coupon="'+esc(c.code)+'" data-label="Usos">'+c.usos+'</td>' +
+        '<td data-label="Status">'+couponStatusSelectHTML(c.code, c.status)+'</td></tr>';
     }).join("");
   }
   document.getElementById("pv-cupons").addEventListener("click", function(e){
@@ -2324,7 +2422,7 @@
     var usedIn = ORDERS.filter(function(o){ return o.coupon === code; });
     var usedHTML = usedIn.length ? '<table class="data"><thead><tr><th>Pedido</th><th>Cliente</th><th>Desconto</th></tr></thead><tbody>' +
       usedIn.map(function(o){
-        return '<tr><td>#'+o.id+'</td><td>'+esc(customerById(o.customerId).name)+'</td><td class="price-cell">− '+money(orderDiscount(o))+'</td></tr>';
+        return '<tr><td data-label="Pedido">#'+o.id+'</td><td data-label="Cliente">'+esc(customerById(o.customerId).name)+'</td><td class="price-cell" data-label="Desconto">− '+money(orderDiscount(o))+'</td></tr>';
       }).join("") + '</tbody></table>' :
       '<p style="font-size:.82rem; color:var(--ink-soft);">Ainda não foi usado em nenhum pedido.</p>';
     modalBody.innerHTML =
