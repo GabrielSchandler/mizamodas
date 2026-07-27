@@ -1910,25 +1910,29 @@
   }
 
   // mouse click-and-drag scrolling for horizontal product rails (touch already scrolls natively)
+  // pointer capture only kicks in once real dragging is confirmed (>6px) — capturing on every
+  // pointerdown was retargeting plain clicks (product cards, arrows, add-to-cart) to the rail itself
   function makeDragScrollable(el){
-    var dragging = false, startX = 0, startScroll = 0, moved = 0;
+    var dragging = false, captured = false, startX = 0, startScroll = 0, moved = 0, pid = null;
     el.addEventListener("pointerdown", function(e){
       if (e.pointerType !== "mouse") return;
-      if (e.target.closest(".p-swatch-arrow, .p-add, .p-fav")) return;
-      dragging = true; moved = 0; startX = e.clientX; startScroll = el.scrollLeft;
-      el.classList.add("dragging");
-      try { el.setPointerCapture(e.pointerId); } catch(err){}
+      dragging = true; captured = false; moved = 0; startX = e.clientX; startScroll = el.scrollLeft; pid = e.pointerId;
     });
     el.addEventListener("pointermove", function(e){
       if (!dragging) return;
       var dx = e.clientX - startX;
       moved = Math.max(moved, Math.abs(dx));
-      el.scrollLeft = startScroll - dx;
+      if (!captured && moved > 6){
+        captured = true;
+        el.classList.add("dragging");
+        try { el.setPointerCapture(pid); } catch(err){}
+      }
+      if (captured) el.scrollLeft = startScroll - dx;
     });
     function stop(){
       if (!dragging) return;
       dragging = false;
-      el.classList.remove("dragging");
+      if (captured){ el.classList.remove("dragging"); captured = false; }
     }
     el.addEventListener("pointerup", stop);
     el.addEventListener("pointercancel", stop);
@@ -1999,6 +2003,10 @@
     document.getElementById("view-loja").scrollTop = 0;
     var stageEl = document.querySelector(".stage");
     if (stageEl) stageEl.scrollTop = 0;
+    // the loja itself doesn't scroll internally — the whole page does — so bring the
+    // frame's top back into view whenever the screen changes (home/categoria/produto)
+    var frameForScroll = document.querySelector(".frame");
+    if (frameForScroll) frameForScroll.scrollIntoView({ block: "start" });
   }
   document.querySelectorAll("[data-nav-home]").forEach(function(el){
     el.addEventListener("click", function(){ goHome(); });
