@@ -148,6 +148,11 @@
   .frame.mobile-view .modal-head { border-radius:16px 16px 0 0; }
   .frame.mobile-view .sheet { width:92%; }
 
+  .frame.mobile-view #view-proposta .prop-inner { padding:32px 20px 40px; }
+  .frame.mobile-view #view-proposta .prop-deliverable { grid-template-columns:1fr; gap:10px; }
+  .frame.mobile-view #view-proposta .prop-bonus-grid { grid-template-columns:1fr; }
+  .frame.mobile-view #view-proposta .prop-head h2 { font-size:1.35rem; }
+
   /* =================== LOJA =================== */
   .loja-header { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:18px 32px; border-bottom:1px solid var(--line); background:var(--surface); position:relative; z-index:3; }
   .brand { display:flex; align-items:center; gap:10px; cursor:pointer; }
@@ -572,8 +577,8 @@
     .kpis { grid-template-columns:1fr 1fr; }
   }
 
-  /* ---------- proposta (fora do frame, mesma página) ---------- */
-  .prop { border:1px solid var(--chrome-line); border-radius:12px; overflow:hidden; margin-top:22px; background:var(--bg); color:var(--ink); font-family:"Archivo", -apple-system, sans-serif; }
+  /* ---------- proposta (terceira tela, igual loja/painel) ---------- */
+  .prop { background:var(--bg); color:var(--ink); font-family:"Archivo", -apple-system, sans-serif; }
   .prop-inner { max-width:640px; margin:0 auto; padding:44px 24px 50px; }
   .prop-eyebrow { display:flex; align-items:center; gap:8px; font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-soft); font-weight:700; margin:0 0 14px; }
   .prop-eyebrow::before { content:""; width:6px; height:6px; border-radius:50%; background:var(--accent); flex:none; }
@@ -641,6 +646,7 @@
     <div class="switcher" id="view-switcher" style="margin-bottom:0;">
       <button type="button" class="on" data-target="loja">Ver como cliente</button>
       <button type="button" data-target="painel">Ver como Miralva</button>
+      <button type="button" data-target="proposta">Ver a proposta</button>
     </div>
     <div class="switcher" id="device-switcher" style="margin-bottom:0;">
       <button type="button" class="on" data-device="desktop">
@@ -1139,6 +1145,120 @@
         </div>
       </div>
 
+      <!-- ============ PROPOSTA ============ -->
+      <div class="view prop" id="view-proposta">
+        <div class="prop-inner">
+          <div class="prop-head">
+            <p class="prop-eyebrow">Proposta — o que você recebe</p>
+            <h2>Investimento pra deixar tudo isso no ar</h2>
+            <p class="prop-lede">Tudo que você navegou nas telas anteriores, mais o que fica combinado entre a gente pra sair do papel.</p>
+          </div>
+
+          <div class="prop-section">
+            <div class="prop-section-head">
+              <h3 class="prop-h">O que você recebe</h3>
+              <p>As peças centrais do projeto — a loja, o painel e a identidade visual por trás de tudo.</p>
+            </div>
+
+            <div class="prop-deliverable">
+              <div><p class="prop-d-label">01 — pra cliente</p><h4>A loja</h4></div>
+              <ul>
+                <li>Catálogo por categoria, com busca</li>
+                <li>Página de cada produto com galeria de fotos, tamanhos e avaliações</li>
+                <li>Carrinho e fechamento do pedido direto no WhatsApp — sem taxa de gateway de pagamento</li>
+                <li class="prop-note">Se preferir, dá pra trocar por pagamento automático (Pix, cartão, boleto) via Mercado Pago — é só avisar que a gente ajusta o escopo</li>
+                <li>Cupom de desconto pra loja toda, uma categoria ou um produto específico</li>
+                <li>Funciona igual num computador ou no celular</li>
+              </ul>
+            </div>
+
+            <div class="prop-deliverable">
+              <div><p class="prop-d-label">02 — pra você</p><h4>O painel</h4></div>
+              <ul>
+                <li>Visão geral de vendas, pedidos novos e produtos com mais saída</li>
+                <li>Pedidos com status (novo → em andamento → concluído) e o telefone do cliente já linkado pro WhatsApp</li>
+                <li>Cadastro de clientes — quem já comprou, quanto gastou, quem é VIP</li>
+                <li>Produtos, categorias e estoque editáveis por você — troca preço, foto ou quantidade sem precisar chamar programador</li>
+                <li>Gerador de artes prontas pra postar no Instagram, direto dos produtos cadastrados</li>
+                <li>Relatórios de venda por período, exportáveis em planilha</li>
+                <li>Também funciona pelo celular — não precisa estar no computador pra acompanhar a loja</li>
+              </ul>
+            </div>
+
+            <div class="prop-deliverable">
+              <div><p class="prop-d-label">03 — a marca</p><h4>Identidade visual</h4></div>
+              <ul>
+                <li>Logo da Miza Moda, pensado pra funcionar na loja, no Instagram e no painel</li>
+                <li>Paleta de cores e tipografia da marca</li>
+                <li>Aplicação consistente em tudo que a cliente vê — site, postagem, WhatsApp</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="prop-section">
+            <div class="prop-section-head">
+              <h3 class="prop-h">Bônus incluso</h3>
+              <p>Esses três itens entram junto com o projeto, sem custo adicional ao valor combinado.</p>
+            </div>
+            <div class="prop-bonus-grid">
+              <div class="prop-bonus-card">
+                <span class="prop-tag">Bônus</span>
+                <h4>Google Meu Negócio</h4>
+                <p>Perfil da loja configurado no Google — endereço, horário e fotos. Aparece quando alguém pesquisar "Miza Moda" ou "loja de roupa" perto dela.</p>
+              </div>
+              <div class="prop-bonus-card">
+                <span class="prop-tag">Bônus</span>
+                <h4>Consultoria Shopee</h4>
+                <p>Duas reuniões de 1h: como criar e configurar a loja lá, precificar e listar os primeiros produtos, e o que prestar atenção em frete e taxas pra não perder margem.</p>
+              </div>
+              <div class="prop-bonus-card">
+                <span class="prop-tag">Incluso no 1º ano</span>
+                <h4>Domínio próprio</h4>
+                <p>Um endereço só da Miza Moda (ex: mizamoda.com.br), sem link de terceiro. Depois do 1º ano, a renovação custa menos de R$ 50/ano.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="prop-section">
+            <div class="prop-trust">
+              <h3 class="prop-h">De quem é isso</h3>
+              <p>Tudo fica registrado nas contas da própria Miza Moda — GitHub (código), Supabase (banco de dados) e Vercel (onde o site fica no ar). Sem mensalidade de plataforma e sem depender de mim pra continuar funcionando.</p>
+              <p>É a diferença entre <strong>alugar</strong> uma loja pronta pra sempre pagar mensalidade, e <strong>ser dona</strong> do que foi construído.</p>
+              <div class="prop-trust-tags">
+                <span>GitHub próprio</span>
+                <span>Supabase próprio</span>
+                <span>Vercel próprio</span>
+                <span>Planos gratuitos</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="prop-section">
+            <div class="prop-section-head">
+              <h3 class="prop-h">Investimento</h3>
+              <p>O que fica combinado entre a gente.</p>
+            </div>
+            <div class="prop-price-card">
+              <div class="prop-price-row">
+                <div><div class="prop-p-name">Site + Painel completo</div><div class="prop-p-desc">Loja online, painel de gestão e identidade visual, do jeito descrito acima</div></div>
+                <div class="prop-p-val">R$ 2.500</div>
+              </div>
+              <div class="prop-price-row">
+                <div><div class="prop-p-name">Bônus incluso</div><div class="prop-p-desc">Google Meu Negócio + consultoria Shopee (2 reuniões de 1h)</div></div>
+                <div class="prop-p-val">R$ 500</div>
+              </div>
+              <div class="prop-price-total">
+                <div><div class="prop-t-name">Total do projeto</div><div class="prop-t-badge">Condição exclusiva — reservada pra indicação de alguém próximo</div></div>
+                <div class="prop-t-val">R$ 3.000</div>
+              </div>
+              <p class="prop-price-note">Esse não é o valor de tabela — é o preço que faz sentido pra quem chegou até mim por indicação, não pra qualquer cliente. Domínio próprio incluso no 1º ano; a partir do 2º, a renovação (menos de R$ 50/ano) fica por conta da Miza Moda, já registrada em nome dela.</p>
+            </div>
+          </div>
+
+          <p class="prop-sign">Gabriel</p>
+        </div>
+      </div>
+
       <div class="drawer-veil" id="drawer-veil"></div>
       <div class="drawer" id="drawer">
         <div class="drawer-head"><h3>Seu carrinho</h3><button class="drawer-close" id="drawer-close">✕</button></div>
@@ -1220,118 +1340,6 @@
     </div>
   </div>
 
-  <section class="prop">
-    <div class="prop-inner">
-      <div class="prop-head">
-        <p class="prop-eyebrow">Proposta — o que você recebe</p>
-        <h2>Investimento pra deixar tudo isso no ar</h2>
-        <p class="prop-lede">Tudo que você navegou acima, mais o que fica combinado entre a gente pra sair do papel.</p>
-      </div>
-
-      <div class="prop-section">
-        <div class="prop-section-head">
-          <h3 class="prop-h">O que você recebe</h3>
-          <p>As peças centrais do projeto — a loja, o painel e a identidade visual por trás de tudo.</p>
-        </div>
-
-        <div class="prop-deliverable">
-          <div><p class="prop-d-label">01 — pra cliente</p><h4>A loja</h4></div>
-          <ul>
-            <li>Catálogo por categoria, com busca</li>
-            <li>Página de cada produto com galeria de fotos, tamanhos e avaliações</li>
-            <li>Carrinho e fechamento do pedido direto no WhatsApp — sem taxa de gateway de pagamento</li>
-            <li class="prop-note">Se preferir, dá pra trocar por pagamento automático (Pix, cartão, boleto) via Mercado Pago — é só avisar que a gente ajusta o escopo</li>
-            <li>Cupom de desconto pra loja toda, uma categoria ou um produto específico</li>
-            <li>Funciona igual num computador ou no celular</li>
-          </ul>
-        </div>
-
-        <div class="prop-deliverable">
-          <div><p class="prop-d-label">02 — pra você</p><h4>O painel</h4></div>
-          <ul>
-            <li>Visão geral de vendas, pedidos novos e produtos com mais saída</li>
-            <li>Pedidos com status (novo → em andamento → concluído) e o telefone do cliente já linkado pro WhatsApp</li>
-            <li>Cadastro de clientes — quem já comprou, quanto gastou, quem é VIP</li>
-            <li>Produtos, categorias e estoque editáveis por você — troca preço, foto ou quantidade sem precisar chamar programador</li>
-            <li>Gerador de artes prontas pra postar no Instagram, direto dos produtos cadastrados</li>
-            <li>Relatórios de venda por período, exportáveis em planilha</li>
-            <li>Também funciona pelo celular — não precisa estar no computador pra acompanhar a loja</li>
-          </ul>
-        </div>
-
-        <div class="prop-deliverable">
-          <div><p class="prop-d-label">03 — a marca</p><h4>Identidade visual</h4></div>
-          <ul>
-            <li>Logo da Miza Moda, pensado pra funcionar na loja, no Instagram e no painel</li>
-            <li>Paleta de cores e tipografia da marca</li>
-            <li>Aplicação consistente em tudo que a cliente vê — site, postagem, WhatsApp</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="prop-section">
-        <div class="prop-section-head">
-          <h3 class="prop-h">Bônus incluso</h3>
-          <p>Esses três itens entram junto com o projeto, sem custo adicional ao valor combinado.</p>
-        </div>
-        <div class="prop-bonus-grid">
-          <div class="prop-bonus-card">
-            <span class="prop-tag">Bônus</span>
-            <h4>Google Meu Negócio</h4>
-            <p>Perfil da loja configurado no Google — endereço, horário e fotos. Aparece quando alguém pesquisar "Miza Moda" ou "loja de roupa" perto dela.</p>
-          </div>
-          <div class="prop-bonus-card">
-            <span class="prop-tag">Bônus</span>
-            <h4>Consultoria Shopee</h4>
-            <p>Duas reuniões de 1h: como criar e configurar a loja lá, precificar e listar os primeiros produtos, e o que prestar atenção em frete e taxas pra não perder margem.</p>
-          </div>
-          <div class="prop-bonus-card">
-            <span class="prop-tag">Incluso no 1º ano</span>
-            <h4>Domínio próprio</h4>
-            <p>Um endereço só da Miza Moda (ex: mizamoda.com.br), sem link de terceiro. Depois do 1º ano, a renovação custa menos de R$ 50/ano.</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="prop-section">
-        <div class="prop-trust">
-          <h3 class="prop-h">De quem é isso</h3>
-          <p>Tudo fica registrado nas contas da própria Miza Moda — GitHub (código), Supabase (banco de dados) e Vercel (onde o site fica no ar). Sem mensalidade de plataforma e sem depender de mim pra continuar funcionando.</p>
-          <p>É a diferença entre <strong>alugar</strong> uma loja pronta pra sempre pagar mensalidade, e <strong>ser dona</strong> do que foi construído.</p>
-          <div class="prop-trust-tags">
-            <span>GitHub próprio</span>
-            <span>Supabase próprio</span>
-            <span>Vercel próprio</span>
-            <span>Planos gratuitos</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="prop-section">
-        <div class="prop-section-head">
-          <h3 class="prop-h">Investimento</h3>
-          <p>O que fica combinado entre a gente.</p>
-        </div>
-        <div class="prop-price-card">
-          <div class="prop-price-row">
-            <div><div class="prop-p-name">Site + Painel completo</div><div class="prop-p-desc">Loja online, painel de gestão e identidade visual, do jeito descrito acima</div></div>
-            <div class="prop-p-val">R$ 2.500</div>
-          </div>
-          <div class="prop-price-row">
-            <div><div class="prop-p-name">Bônus incluso</div><div class="prop-p-desc">Google Meu Negócio + consultoria Shopee (2 reuniões de 1h)</div></div>
-            <div class="prop-p-val">R$ 500</div>
-          </div>
-          <div class="prop-price-total">
-            <div><div class="prop-t-name">Total do projeto</div><div class="prop-t-badge">Condição exclusiva — reservada pra indicação de alguém próximo</div></div>
-            <div class="prop-t-val">R$ 3.000</div>
-          </div>
-          <p class="prop-price-note">Esse não é o valor de tabela — é o preço que faz sentido pra quem chegou até mim por indicação, não pra qualquer cliente. Domínio próprio incluso no 1º ano; a partir do 2º, a renovação (menos de R$ 50/ano) fica por conta da Miza Moda, já registrada em nome dela.</p>
-        </div>
-      </div>
-
-      <p class="prop-sign">Gabriel</p>
-    </div>
-  </section>
 </div>
 
 <script>(function(){
@@ -2071,7 +2079,9 @@
     var target = btn.dataset.target;
     document.getElementById("view-loja").classList.toggle("on", target === "loja");
     document.getElementById("view-painel").classList.toggle("on", target === "painel");
-    urlEl.textContent = target === "loja" ? "mizamoda.com.br" : "painel.mizamoda.com.br";
+    document.getElementById("view-proposta").classList.toggle("on", target === "proposta");
+    var urlByTarget = { loja:"mizamoda.com.br", painel:"painel.mizamoda.com.br", proposta:"proposta.mizamoda.com.br" };
+    urlEl.textContent = urlByTarget[target];
     closeDrawer();
   });
   deviceSwitcher.addEventListener("click", function(e){
