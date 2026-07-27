@@ -248,6 +248,16 @@
   .c-thumb, .row-thumb { position:relative; overflow:hidden; }
   .p-card:hover .p-swatch img { transform:scale(1.045); }
   .p-badge { position:absolute; top:10px; left:10px; background:var(--accent); color:#FBF6EE; font-size:.6rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; padding:4px 8px; border-radius:2px; z-index:1; }
+
+  /* galeria no hover — miniaturas de produto em todo lugar que aparecem */
+  .p-swatch .p-img { opacity:0; transition:opacity .6s ease, transform .5s cubic-bezier(.22,.9,.32,1); }
+  .p-swatch .p-img.on { opacity:1; z-index:0; }
+  .p-swatch-arrow { position:absolute; top:50%; transform:translateY(-50%); z-index:3; width:24px; height:24px; border-radius:50%; border:none; background:rgba(255,255,255,.92); display:flex; align-items:center; justify-content:center; cursor:pointer; opacity:0; pointer-events:none; transition:opacity .18s ease, background .15s ease; box-shadow:0 1px 5px rgba(43,38,32,.2); }
+  .p-swatch-arrow svg { width:10px; height:10px; stroke:var(--ink); }
+  .p-swatch-prev { left:7px; }
+  .p-swatch-next { right:7px; }
+  .p-swatch.has-gallery:hover .p-swatch-arrow { opacity:1; pointer-events:auto; }
+  .p-swatch-arrow:hover { background:#fff; }
   .p-info { padding:12px 14px 14px; }
   .p-name { font-size:.84rem; font-weight:600; margin:0 0 4px; }
   .p-price { font-size:.94rem; font-weight:700; color:var(--accent); margin:0 0 2px; font-variant-numeric:tabular-nums; }
@@ -1593,9 +1603,18 @@
   /* ======================= LOJA: cards, rails, carousel ======================= */
 
   function cardHTML(p, showBadge){
-    var media = '<div class="p-swatch'+(p.img?' has-photo':'')+'">' +
-      (p.img ? '<img src="'+p.img+'" alt="" loading="lazy" draggable="false" />' : '') +
-      (showBadge && p.badge ? '<span class="p-badge">'+p.badge+'</span>' : '') + '</div>';
+    var gallery = p.gallery && p.gallery.length ? p.gallery : (p.img ? [p.img] : []);
+    var hasGallery = gallery.length > 1;
+    var imgsHTML = gallery.map(function(src, i){
+      return '<img class="p-img'+(i===0?' on':'')+'" src="'+src+'" alt="" loading="lazy" draggable="false" />';
+    }).join("");
+    var arrowsHTML = hasGallery ?
+      '<button type="button" class="p-swatch-arrow p-swatch-prev" aria-label="Foto anterior"><svg viewBox="0 0 24 24" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="m15 18-6-6 6-6"/></svg></button>' +
+      '<button type="button" class="p-swatch-arrow p-swatch-next" aria-label="Próxima foto"><svg viewBox="0 0 24 24" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="m9 18 6-6-6-6"/></svg></button>' : "";
+    var media = '<div class="p-swatch'+(p.img?' has-photo':'')+(hasGallery?' has-gallery':'')+'">' +
+      imgsHTML +
+      (showBadge && p.badge ? '<span class="p-badge">'+p.badge+'</span>' : '') +
+      arrowsHTML + '</div>';
     return '<div class="p-card" data-open-product="'+p.id+'">' + media +
       '<div class="p-info">' +
         '<p class="p-name">'+esc(p.name)+'</p>' +
@@ -1605,7 +1624,59 @@
       '</div></div>';
   }
 
-  document.getElementById("view-loja").addEventListener("click", function(e){
+  // hover-carousel nas miniaturas de produto: passa o mouse -> depois de um instante, troca de foto sozinho; setas navegam na hora
+  var cardGalleryState = new WeakMap();
+  function cardGallerySet(sw, idx){
+    var imgs = sw.querySelectorAll(".p-img");
+    if (!imgs.length) return 0;
+    idx = (idx + imgs.length) % imgs.length;
+    imgs.forEach(function(im, i){ im.classList.toggle("on", i === idx); });
+    return idx;
+  }
+  function cardGalleryStart(sw){
+    if (cardGalleryState.has(sw)) return;
+    if (sw.querySelectorAll(".p-img").length < 2) return;
+    var st = { idx:0, delay:null, timer:null };
+    st.delay = setTimeout(function(){
+      st.timer = setInterval(function(){ st.idx = cardGallerySet(sw, st.idx + 1); }, 1900);
+    }, 650);
+    cardGalleryState.set(sw, st);
+  }
+  function cardGalleryStop(sw){
+    var st = cardGalleryState.get(sw);
+    if (!st) return;
+    clearTimeout(st.delay); clearInterval(st.timer);
+    cardGalleryState.delete(sw);
+    cardGallerySet(sw, 0);
+  }
+  function cardGalleryStep(sw, dir){
+    var st = cardGalleryState.get(sw);
+    var idx = cardGallerySet(sw, (st ? st.idx : 0) + dir);
+    if (st){
+      st.idx = idx;
+      clearInterval(st.timer);
+      st.timer = setInterval(function(){ st.idx = cardGallerySet(sw, st.idx + 1); }, 1900);
+    }
+  }
+  var lojaViewEl = document.getElementById("view-loja");
+  lojaViewEl.addEventListener("mouseover", function(e){
+    var sw = e.target.closest(".p-swatch.has-gallery");
+    if (!sw || sw.contains(e.relatedTarget)) return;
+    cardGalleryStart(sw);
+  });
+  lojaViewEl.addEventListener("mouseout", function(e){
+    var sw = e.target.closest(".p-swatch.has-gallery");
+    if (!sw || sw.contains(e.relatedTarget)) return;
+    cardGalleryStop(sw);
+  });
+
+  lojaViewEl.addEventListener("click", function(e){
+    var arrow = e.target.closest(".p-swatch-arrow");
+    if (arrow){
+      e.preventDefault();
+      cardGalleryStep(arrow.closest(".p-swatch"), arrow.classList.contains("p-swatch-next") ? 1 : -1);
+      return;
+    }
     var addBtn = e.target.closest(".p-add");
     if (addBtn){
       var id = addBtn.dataset.id;
