@@ -571,6 +571,59 @@
     .side-user { display:none; }
     .kpis { grid-template-columns:1fr 1fr; }
   }
+
+  /* ---------- proposta (fora do frame, mesma página) ---------- */
+  .prop { border:1px solid var(--chrome-line); border-radius:12px; overflow:hidden; margin-top:22px; background:var(--bg); color:var(--ink); font-family:"Archivo", -apple-system, sans-serif; }
+  .prop-inner { max-width:640px; margin:0 auto; padding:44px 24px 50px; }
+  .prop-eyebrow { display:flex; align-items:center; gap:8px; font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-soft); font-weight:700; margin:0 0 14px; }
+  .prop-eyebrow::before { content:""; width:6px; height:6px; border-radius:50%; background:var(--accent); flex:none; }
+  .prop-head h2 { font-size:1.6rem; margin:0 0 10px; letter-spacing:-.015em; text-wrap:balance; max-width:20ch; }
+  .prop-head > p.prop-lede { font-size:.96rem; line-height:1.6; color:var(--ink-soft); margin:0 0 40px; max-width:52ch; }
+
+  .prop-section { padding:38px 0; border-top:1px solid var(--line); }
+  .prop-section:first-of-type { border-top:none; padding-top:0; }
+  .prop-section-head { margin:0 0 22px; }
+  .prop-section-head h3.prop-h { font-size:1.12rem; margin:0 0 5px; letter-spacing:-.01em; }
+  .prop-section-head p { font-size:.86rem; color:var(--ink-soft); margin:0; max-width:50ch; }
+
+  .prop-deliverable { display:grid; grid-template-columns:1fr 1.5fr; gap:22px; padding:20px 0; border-top:1px solid var(--line); }
+  .prop-deliverable:first-of-type { border-top:none; padding-top:0; }
+  @media (max-width:560px) { .prop-deliverable { grid-template-columns:1fr; gap:10px; } }
+  .prop-d-label { font-size:.66rem; text-transform:uppercase; letter-spacing:.1em; color:var(--ink-soft); font-weight:700; margin:0; }
+  .prop-deliverable h4 { font-size:1.02rem; margin:5px 0 0; letter-spacing:-.005em; }
+  .prop-deliverable ul { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; }
+  .prop-deliverable li { font-size:.88rem; line-height:1.55; color:var(--ink); padding-left:18px; position:relative; }
+  .prop-deliverable li::before { content:""; position:absolute; left:0; top:.5em; width:7px; height:2px; background:var(--accent); }
+  .prop-deliverable li.prop-note { color:var(--ink-soft); font-size:.82rem; }
+
+  .prop-bonus-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  @media (max-width:560px) { .prop-bonus-grid { grid-template-columns:1fr; } }
+  .prop-bonus-card { background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:18px; }
+  .prop-bonus-card .prop-tag { display:inline-block; font-size:.6rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; background:var(--accent-soft); color:var(--accent); padding:4px 8px; border-radius:3px; margin-bottom:10px; }
+  .prop-bonus-card h4 { font-size:.92rem; margin:0 0 6px; }
+  .prop-bonus-card p { font-size:.8rem; line-height:1.5; color:var(--ink-soft); margin:0; }
+
+  .prop-trust { background:var(--surface-2); border-radius:10px; padding:26px 24px; }
+  .prop-trust h3.prop-h { font-size:1.05rem; margin:0 0 10px; }
+  .prop-trust p { font-size:.88rem; line-height:1.6; color:var(--ink); margin:0 0 14px; max-width:56ch; }
+  .prop-trust p:last-of-type { margin-bottom:0; }
+  .prop-trust p strong { color:var(--accent); }
+  .prop-trust-tags { display:flex; flex-wrap:wrap; gap:7px; margin-top:14px; }
+  .prop-trust-tags span { font-size:.72rem; font-weight:700; background:var(--surface); border:1px solid var(--line); color:var(--ink); padding:5px 11px; border-radius:999px; }
+
+  .prop-price-card { background:var(--ink); color:var(--bg); border-radius:12px; padding:30px 26px; }
+  .prop-price-row { display:flex; justify-content:space-between; align-items:baseline; gap:14px; padding:12px 0; border-bottom:1px solid rgba(247,243,236,.16); }
+  .prop-price-row:first-of-type { padding-top:0; }
+  .prop-price-row .prop-p-name { font-size:.92rem; font-weight:600; }
+  .prop-price-row .prop-p-desc { font-size:.75rem; color:rgba(247,243,236,.6); margin-top:3px; }
+  .prop-price-row .prop-p-val { font-size:1rem; font-weight:700; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .prop-price-total { display:flex; justify-content:space-between; align-items:flex-end; padding-top:18px; gap:14px; }
+  .prop-price-total .prop-t-name { font-size:.74rem; text-transform:uppercase; letter-spacing:.1em; color:rgba(247,243,236,.65); font-weight:700; }
+  .prop-price-total .prop-t-badge { display:inline-block; font-size:.72rem; font-weight:600; color:#E3A47C; margin-top:6px; }
+  .prop-price-total .prop-t-val { font-size:1.85rem; font-weight:700; color:#E3A47C; font-variant-numeric:tabular-nums; letter-spacing:-.01em; }
+  .prop-price-note { font-size:.75rem; color:rgba(247,243,236,.55); margin:16px 0 0; line-height:1.5; }
+
+  .prop-sign { text-align:center; font-size:.82rem; color:var(--ink-soft); margin:36px 0 0; }
 </style>
 
 <div class="page">
@@ -1166,6 +1219,119 @@
       <div class="toast" id="toast"></div>
     </div>
   </div>
+
+  <section class="prop">
+    <div class="prop-inner">
+      <div class="prop-head">
+        <p class="prop-eyebrow">Proposta — o que você recebe</p>
+        <h2>Investimento pra deixar tudo isso no ar</h2>
+        <p class="prop-lede">Tudo que você navegou acima, mais o que fica combinado entre a gente pra sair do papel.</p>
+      </div>
+
+      <div class="prop-section">
+        <div class="prop-section-head">
+          <h3 class="prop-h">O que você recebe</h3>
+          <p>As peças centrais do projeto — a loja, o painel e a identidade visual por trás de tudo.</p>
+        </div>
+
+        <div class="prop-deliverable">
+          <div><p class="prop-d-label">01 — pra cliente</p><h4>A loja</h4></div>
+          <ul>
+            <li>Catálogo por categoria, com busca</li>
+            <li>Página de cada produto com galeria de fotos, tamanhos e avaliações</li>
+            <li>Carrinho e fechamento do pedido direto no WhatsApp — sem taxa de gateway de pagamento</li>
+            <li class="prop-note">Se preferir, dá pra trocar por pagamento automático (Pix, cartão, boleto) via Mercado Pago — é só avisar que a gente ajusta o escopo</li>
+            <li>Cupom de desconto pra loja toda, uma categoria ou um produto específico</li>
+            <li>Funciona igual num computador ou no celular</li>
+          </ul>
+        </div>
+
+        <div class="prop-deliverable">
+          <div><p class="prop-d-label">02 — pra você</p><h4>O painel</h4></div>
+          <ul>
+            <li>Visão geral de vendas, pedidos novos e produtos com mais saída</li>
+            <li>Pedidos com status (novo → em andamento → concluído) e o telefone do cliente já linkado pro WhatsApp</li>
+            <li>Cadastro de clientes — quem já comprou, quanto gastou, quem é VIP</li>
+            <li>Produtos, categorias e estoque editáveis por você — troca preço, foto ou quantidade sem precisar chamar programador</li>
+            <li>Gerador de artes prontas pra postar no Instagram, direto dos produtos cadastrados</li>
+            <li>Relatórios de venda por período, exportáveis em planilha</li>
+            <li>Também funciona pelo celular — não precisa estar no computador pra acompanhar a loja</li>
+          </ul>
+        </div>
+
+        <div class="prop-deliverable">
+          <div><p class="prop-d-label">03 — a marca</p><h4>Identidade visual</h4></div>
+          <ul>
+            <li>Logo da Miza Moda, pensado pra funcionar na loja, no Instagram e no painel</li>
+            <li>Paleta de cores e tipografia da marca</li>
+            <li>Aplicação consistente em tudo que a cliente vê — site, postagem, WhatsApp</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="prop-section">
+        <div class="prop-section-head">
+          <h3 class="prop-h">Bônus incluso</h3>
+          <p>Esses três itens entram junto com o projeto, sem custo adicional ao valor combinado.</p>
+        </div>
+        <div class="prop-bonus-grid">
+          <div class="prop-bonus-card">
+            <span class="prop-tag">Bônus</span>
+            <h4>Google Meu Negócio</h4>
+            <p>Perfil da loja configurado no Google — endereço, horário e fotos. Aparece quando alguém pesquisar "Miza Moda" ou "loja de roupa" perto dela.</p>
+          </div>
+          <div class="prop-bonus-card">
+            <span class="prop-tag">Bônus</span>
+            <h4>Consultoria Shopee</h4>
+            <p>Duas reuniões de 1h: como criar e configurar a loja lá, precificar e listar os primeiros produtos, e o que prestar atenção em frete e taxas pra não perder margem.</p>
+          </div>
+          <div class="prop-bonus-card">
+            <span class="prop-tag">Incluso no 1º ano</span>
+            <h4>Domínio próprio</h4>
+            <p>Um endereço só da Miza Moda (ex: mizamoda.com.br), sem link de terceiro. Depois do 1º ano, a renovação custa menos de R$ 50/ano.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="prop-section">
+        <div class="prop-trust">
+          <h3 class="prop-h">De quem é isso</h3>
+          <p>Tudo fica registrado nas contas da própria Miza Moda — GitHub (código), Supabase (banco de dados) e Vercel (onde o site fica no ar). Sem mensalidade de plataforma e sem depender de mim pra continuar funcionando.</p>
+          <p>É a diferença entre <strong>alugar</strong> uma loja pronta pra sempre pagar mensalidade, e <strong>ser dona</strong> do que foi construído.</p>
+          <div class="prop-trust-tags">
+            <span>GitHub próprio</span>
+            <span>Supabase próprio</span>
+            <span>Vercel próprio</span>
+            <span>Planos gratuitos</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="prop-section">
+        <div class="prop-section-head">
+          <h3 class="prop-h">Investimento</h3>
+          <p>O que fica combinado entre a gente.</p>
+        </div>
+        <div class="prop-price-card">
+          <div class="prop-price-row">
+            <div><div class="prop-p-name">Site + Painel completo</div><div class="prop-p-desc">Loja online, painel de gestão e identidade visual, do jeito descrito acima</div></div>
+            <div class="prop-p-val">R$ 2.500</div>
+          </div>
+          <div class="prop-price-row">
+            <div><div class="prop-p-name">Bônus incluso</div><div class="prop-p-desc">Google Meu Negócio + consultoria Shopee (2 reuniões de 1h)</div></div>
+            <div class="prop-p-val">R$ 500</div>
+          </div>
+          <div class="prop-price-total">
+            <div><div class="prop-t-name">Total do projeto</div><div class="prop-t-badge">Condição exclusiva — reservada pra indicação de alguém próximo</div></div>
+            <div class="prop-t-val">R$ 3.000</div>
+          </div>
+          <p class="prop-price-note">Esse não é o valor de tabela — é o preço que faz sentido pra quem chegou até mim por indicação, não pra qualquer cliente. Domínio próprio incluso no 1º ano; a partir do 2º, a renovação (menos de R$ 50/ano) fica por conta da Miza Moda, já registrada em nome dela.</p>
+        </div>
+      </div>
+
+      <p class="prop-sign">Gabriel</p>
+    </div>
+  </section>
 </div>
 
 <script>(function(){
