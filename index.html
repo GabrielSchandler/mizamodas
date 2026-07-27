@@ -258,6 +258,12 @@
   .p-swatch-next { right:7px; }
   .p-swatch.has-gallery:hover .p-swatch-arrow { opacity:1; pointer-events:auto; }
   .p-swatch-arrow:hover { background:#fff; }
+
+  .p-fav { position:absolute; top:8px; right:8px; z-index:2; width:28px; height:28px; border-radius:50%; border:none; background:rgba(255,255,255,.9); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 1px 4px rgba(43,38,32,.16); }
+  .p-fav svg { width:15px; height:15px; stroke:var(--ink-soft); fill:none; transition:stroke .15s ease, fill .15s ease, transform .12s ease; }
+  .p-fav:hover svg { stroke:var(--accent); }
+  .p-fav.on svg { fill:var(--accent); stroke:var(--accent); }
+  .p-fav:active svg { transform:scale(.82); }
   .p-info { padding:12px 14px 14px; }
   .p-name { font-size:.84rem; font-weight:600; margin:0 0 4px; }
   .p-price { font-size:.94rem; font-weight:700; color:var(--accent); margin:0 0 2px; font-variant-numeric:tabular-nums; }
@@ -338,8 +344,31 @@
   .c-qty span { font-size:.76rem; min-width:16px; text-align:center; font-variant-numeric:tabular-nums; }
   .c-remove { border:none; background:none; color:var(--ink-soft); font-size:.9rem; cursor:pointer; align-self:flex-start; }
 
-  .drawer-sub { display:flex; justify-content:space-between; padding:14px 0; font-size:.9rem; font-weight:700; }
+  /* frete grátis */
+  .ship-bar { margin:14px 0 4px; }
+  .ship-bar-track { height:6px; border-radius:999px; background:var(--surface-2); overflow:hidden; }
+  .ship-bar-fill { height:100%; background:var(--accent); border-radius:999px; transition:width .4s cubic-bezier(.22,.9,.32,1); }
+  .ship-bar-fill.done { background:var(--good); }
+  .ship-bar-msg { font-size:.76rem; color:var(--ink-soft); margin:8px 0 0; display:flex; align-items:center; gap:6px; }
+  .ship-bar-msg strong { color:var(--ink); font-weight:700; }
+  .ship-bar-msg.done { color:var(--good); font-weight:600; }
+  .ship-bar-msg.done svg { width:14px; height:14px; stroke:var(--good); flex:none; }
+
+  /* cupom no carrinho */
+  .cart-coupon-form { display:flex; gap:8px; margin:14px 0 4px; }
+  .cart-coupon-form input { flex:1; min-width:0; border:1px solid var(--line); background:var(--bg); color:var(--ink); font-family:inherit; font-size:.82rem; padding:9px 11px; border-radius:4px; text-transform:uppercase; }
+  .cart-coupon-form input::placeholder { text-transform:none; }
+  .cart-coupon-form .btn-ghost { padding:9px 14px; font-size:.72rem; flex:none; }
+  .cart-coupon { display:flex; align-items:center; justify-content:space-between; gap:10px; margin:14px 0 4px; padding:10px 12px; border:1px dashed var(--accent); border-radius:6px; background:var(--accent-soft); }
+  .cart-coupon-code { font-size:.8rem; font-weight:700; text-transform:uppercase; }
+  .cart-coupon-desc { font-size:.7rem; color:var(--ink-soft); display:block; margin-top:2px; }
+  .cart-coupon-remove { border:none; background:none; color:var(--ink-soft); font-size:.72rem; font-weight:600; cursor:pointer; text-decoration:underline; flex:none; }
+
+  .drawer-sub { display:flex; justify-content:space-between; padding:10px 0; font-size:.9rem; font-weight:700; }
   .drawer-sub span:last-child { font-variant-numeric:tabular-nums; color:var(--accent); }
+  .drawer-sub.drawer-discount { font-size:.8rem; font-weight:600; color:var(--good); }
+  .drawer-sub.drawer-discount span:last-child { color:var(--good); }
+  .drawer-sub.drawer-grand { border-top:1px solid var(--line); padding-top:12px; margin-top:2px; font-size:1rem; }
 
   .wa-label { font-size:.7rem; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-soft); font-weight:700; margin:14px 0 8px; }
   .wa-bubble { background:var(--surface-2); border-radius:10px; padding:12px 14px; font-size:.78rem; line-height:1.6; color:var(--ink); white-space:pre-wrap; }
@@ -1540,6 +1569,8 @@
 
   var cart = {};
   var deliveryMode = "retirada";
+  var appliedCoupon = null;
+  var FREE_SHIPPING_THRESHOLD = 250;
   var cartCount = document.getElementById("cart-count");
   var drawerBody = document.getElementById("drawer-body");
   var drawerFoot = document.getElementById("drawer-foot");
@@ -1549,10 +1580,41 @@
     Object.keys(cart).forEach(function(id){ var p = productById(id); if (p) t += p.price * cart[id]; });
     return t;
   }
+  function cartDiscount(){
+    if (!appliedCoupon) return 0;
+    var c = couponByCode(appliedCoupon);
+    if (!c) return 0;
+    var sub = cartTotal();
+    return c.type === "percent" ? sub * c.value / 100 : Math.min(c.value, sub);
+  }
+  function cartGrandTotal(){ return Math.max(0, cartTotal() - cartDiscount()); }
   function addToCart(id, qty){
     qty = qty || 1;
     cart[id] = (cart[id] || 0) + qty;
     renderCart();
+  }
+  function applyCoupon(raw){
+    var code = (raw || "").trim().toUpperCase();
+    if (!code) return;
+    var c = couponByCode(code);
+    if (!c){ toast("Cupom \"" + code + "\" não encontrado."); return; }
+    if (c.status !== "ativo"){ toast("O cupom " + c.code + " está expirado."); return; }
+    var now = new Date();
+    if (c.start && new Date(c.start) > now){ toast("O cupom " + c.code + " ainda não começou a valer."); return; }
+    if (c.end && new Date(c.end) < now){ toast("O cupom " + c.code + " já expirou."); return; }
+    appliedCoupon = c.code;
+    renderCart();
+    toast("Cupom " + c.code + " aplicado!");
+  }
+  function shipBarHTML(sub){
+    var remaining = FREE_SHIPPING_THRESHOLD - sub;
+    if (remaining <= 0){
+      return '<div class="ship-bar"><div class="ship-bar-track"><div class="ship-bar-fill done" style="width:100%"></div></div>' +
+        '<p class="ship-bar-msg done"><svg viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M20 6 9 17l-5-5"/></svg>Você ganhou frete grátis</p></div>';
+    }
+    var pct = Math.max(2, Math.round(sub / FREE_SHIPPING_THRESHOLD * 100));
+    return '<div class="ship-bar"><div class="ship-bar-track"><div class="ship-bar-fill" style="width:'+pct+'%"></div></div>' +
+      '<p class="ship-bar-msg">Faltam <strong>'+money(remaining)+'</strong> pra frete grátis</p></div>';
   }
   function renderCart(){
     var ids = Object.keys(cart).filter(function(id){ return cart[id] > 0; });
@@ -1560,6 +1622,7 @@
     cartCount.textContent = count;
     cartCount.dataset.empty = count === 0 ? "true" : "false";
     if (ids.length === 0){
+      appliedCoupon = null;
       drawerBody.innerHTML = '<p class="drawer-empty">Seu carrinho está vazio.</p>';
       drawerFoot.style.display = "none";
       return;
@@ -1575,7 +1638,22 @@
           '<span class="c-qty"><button data-act="dec" data-id="'+id+'">−</button><span>'+qty+'</span><button data-act="inc" data-id="'+id+'">+</button></span>' +
         '</div><button class="c-remove" data-act="rm" data-id="'+id+'">✕</button></div>';
     });
-    html += '<div class="drawer-sub"><span>Subtotal</span><span>'+money(cartTotal())+'</span></div>';
+    var sub = cartTotal(), disc = cartDiscount(), grand = cartGrandTotal();
+    html += shipBarHTML(sub);
+    if (appliedCoupon){
+      var c = couponByCode(appliedCoupon);
+      var descTxt = c ? (c.type === "percent" ? "-" + c.value + "%" : "- " + money(c.value)) + " aplicado" : "aplicado";
+      html += '<div class="cart-coupon"><div><span class="cart-coupon-code">'+esc(appliedCoupon)+'</span><span class="cart-coupon-desc">'+esc(descTxt)+'</span></div>' +
+        '<button type="button" id="coupon-remove" class="cart-coupon-remove">Remover</button></div>';
+    } else {
+      html += '<div class="cart-coupon-form"><input type="text" id="coupon-input" placeholder="Cupom de desconto" />' +
+        '<button type="button" id="coupon-apply" class="btn-ghost">Aplicar</button></div>';
+    }
+    html += '<div class="drawer-sub"><span>Subtotal</span><span>'+money(sub)+'</span></div>';
+    if (disc > 0){
+      html += '<div class="drawer-sub drawer-discount"><span>Cupom '+esc(appliedCoupon)+'</span><span>− '+money(disc)+'</span></div>';
+      html += '<div class="drawer-sub drawer-grand"><span>Total</span><span>'+money(grand)+'</span></div>';
+    }
     html += '<p class="wa-label" style="margin-top:0;">Como prefere receber</p>';
     html += '<div class="seg-toggle" id="cart-delivery">' +
       '<button type="button" data-delivery="retirada" class="'+(deliveryMode==="retirada"?"on":"")+'">Retirar no local</button>' +
@@ -1583,10 +1661,15 @@
     '</div>';
     html += '<p class="wa-label">Prévia da mensagem pro WhatsApp da loja</p>';
     var deliveryLine = deliveryMode === "retirada" ? "Retirada no local" : "Entrega a combinar";
-    html += '<div class="wa-bubble">Oi! Quero fechar esse pedido:\n' + lines.join("\n") + '\n\nEntrega: ' + deliveryLine + '\nTotal: ' + money(cartTotal()) + '</div>';
+    var totalLine = disc > 0 ? ("Subtotal: " + money(sub) + "\nCupom " + appliedCoupon + ": − " + money(disc) + "\nTotal: " + money(grand)) : ("Total: " + money(sub));
+    html += '<div class="wa-bubble">Oi! Quero fechar esse pedido:\n' + lines.join("\n") + '\n\nEntrega: ' + deliveryLine + '\n' + totalLine + '</div>';
     drawerBody.innerHTML = html;
   }
   drawerBody.addEventListener("click", function(e){
+    var applyBtn = e.target.closest("#coupon-apply");
+    if (applyBtn){ applyCoupon(document.getElementById("coupon-input").value); return; }
+    var removeBtn = e.target.closest("#coupon-remove");
+    if (removeBtn){ appliedCoupon = null; renderCart(); toast("Cupom removido."); return; }
     var deliveryBtn = e.target.closest("[data-delivery]");
     if (deliveryBtn){ deliveryMode = deliveryBtn.dataset.delivery; renderCart(); return; }
     var btn = e.target.closest("button[data-act]");
@@ -1596,6 +1679,9 @@
     if (btn.dataset.act === "dec") cart[id] = Math.max(0, cart[id]-1);
     if (btn.dataset.act === "rm") cart[id] = 0;
     renderCart();
+  });
+  drawerBody.addEventListener("keydown", function(e){
+    if (e.key === "Enter" && e.target.id === "coupon-input"){ e.preventDefault(); applyCoupon(e.target.value); }
   });
   var drawer = document.getElementById("drawer");
   var drawerVeil = document.getElementById("drawer-veil");
@@ -1611,6 +1697,7 @@
 
   /* ======================= LOJA: cards, rails, carousel ======================= */
 
+  var favorites = new Set();
   function cardHTML(p, showBadge){
     var gallery = p.gallery && p.gallery.length ? p.gallery : (p.img ? [p.img] : []);
     var hasGallery = gallery.length > 1;
@@ -1620,10 +1707,13 @@
     var arrowsHTML = hasGallery ?
       '<button type="button" class="p-swatch-arrow p-swatch-prev" aria-label="Foto anterior"><svg viewBox="0 0 24 24" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="m15 18-6-6 6-6"/></svg></button>' +
       '<button type="button" class="p-swatch-arrow p-swatch-next" aria-label="Próxima foto"><svg viewBox="0 0 24 24" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="m9 18 6-6-6-6"/></svg></button>' : "";
+    var favOn = favorites.has(String(p.id));
+    var favBtn = '<button type="button" class="p-fav'+(favOn?' on':'')+'" data-fav-id="'+p.id+'" aria-label="'+(favOn?'Remover dos favoritos':'Favoritar')+'">' +
+      '<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"/></svg></button>';
     var media = '<div class="p-swatch'+(p.img?' has-photo':'')+(hasGallery?' has-gallery':'')+'">' +
       imgsHTML +
       (showBadge && p.badge ? '<span class="p-badge">'+p.badge+'</span>' : '') +
-      arrowsHTML + '</div>';
+      arrowsHTML + favBtn + '</div>';
     return '<div class="p-card" data-open-product="'+p.id+'">' + media +
       '<div class="p-info">' +
         '<p class="p-name">'+esc(p.name)+'</p>' +
@@ -1680,6 +1770,18 @@
   });
 
   lojaViewEl.addEventListener("click", function(e){
+    var favBtn = e.target.closest(".p-fav");
+    if (favBtn){
+      e.preventDefault();
+      var favId = String(favBtn.dataset.favId);
+      var nowOn;
+      if (favorites.has(favId)){ favorites.delete(favId); nowOn = false; }
+      else { favorites.add(favId); nowOn = true; }
+      favBtn.classList.toggle("on", nowOn);
+      favBtn.setAttribute("aria-label", nowOn ? "Remover dos favoritos" : "Favoritar");
+      toast(nowOn ? "Adicionado aos favoritos." : "Removido dos favoritos.");
+      return;
+    }
     var arrow = e.target.closest(".p-swatch-arrow");
     if (arrow){
       e.preventDefault();
@@ -1812,7 +1914,7 @@
     var dragging = false, startX = 0, startScroll = 0, moved = 0;
     el.addEventListener("pointerdown", function(e){
       if (e.pointerType !== "mouse") return;
-      if (e.target.closest(".p-swatch-arrow, .p-add")) return;
+      if (e.target.closest(".p-swatch-arrow, .p-add, .p-fav")) return;
       dragging = true; moved = 0; startX = e.clientX; startScroll = el.scrollLeft;
       el.classList.add("dragging");
       try { el.setPointerCapture(e.pointerId); } catch(err){}
