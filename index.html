@@ -1803,6 +1803,7 @@
     var dragging = false, startX = 0, startScroll = 0, moved = 0;
     el.addEventListener("pointerdown", function(e){
       if (e.pointerType !== "mouse") return;
+      if (e.target.closest(".p-swatch-arrow, .p-add")) return;
       dragging = true; moved = 0; startX = e.clientX; startScroll = el.scrollLeft;
       el.classList.add("dragging");
       try { el.setPointerCapture(e.pointerId); } catch(err){}
